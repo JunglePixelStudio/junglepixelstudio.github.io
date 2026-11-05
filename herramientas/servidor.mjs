@@ -7,7 +7,8 @@ import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'docs');
+// Carpeta a servir: docs/ por defecto, o la que se pase como 2.º argumento (p. ej. demo).
+const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', process.argv[3] || 'docs');
 const PUERTO = Number(process.env.PORT || process.argv[2] || 4173);
 
 const TIPOS = {
@@ -25,6 +26,7 @@ const TIPOS = {
   '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8',
   '.woff2': 'font/woff2',
+  '.mp4': 'video/mp4',
 };
 
 async function archivo(ruta) {

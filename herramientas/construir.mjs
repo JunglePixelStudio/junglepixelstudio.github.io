@@ -5,13 +5,18 @@
 import { readFile, writeFile, mkdir, rm, cp, access } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sitio, juegos, tiposEnlace, paginas, textos } from '../src/sitio.mjs';
+import { sitio, juegos as juegosReales, tiposEnlace, paginas, textos } from '../src/sitio.mjs';
 import { svgPixel } from '../src/pixelfont.mjs';
+import { svgBosque, svgBordeBosque } from '../src/bosque.mjs';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(RAIZ, 'src');
-const OUT = path.join(RAIZ, 'docs');
 const IDIOMAS = ['es', 'en'];
+
+// DEMO=1 genera una prueba local en demo/ con las portadas de src/demo/ (no se publica).
+const DEMO = process.env.DEMO === '1';
+const OUT = path.join(RAIZ, DEMO ? 'demo' : 'docs');
+const juegos = DEMO ? (await import('../src/demo/juegos-demo.mjs')).juegos : juegosReales;
 
 // ---------------------------------------------------------------- utilidades
 const esc = (s) =>
@@ -89,7 +94,7 @@ function tarjetaJuego(j, lang, desde) {
   const etiquetas = (j.etiquetas?.[lang] ?? []).map((e) => `<li class="chip">${esc(e)}</li>`).join('');
   let portada;
   if (j.secreto) {
-    portada = `<div class="secret" aria-hidden="true">${svgPixel(['?'], { clase: 'pixel secret__glyph' })}<span class="secret__label">${lang === 'es' ? 'Sin anunciar' : 'Unannounced'}</span></div>`;
+    portada = `<div class="secret" aria-hidden="true">${svgBosque(undefined, 'mini-forest')}${svgPixel(['?'], { clase: 'pixel secret__glyph' })}<span class="secret__label">${lang === 'es' ? 'Sin anunciar' : 'Unannounced'}</span></div>`;
   } else {
     portada = `<img src="${prefijo(desde)}${esc(j.imagen)}" alt="${esc(t(j.imagenAlt ?? j.titulo))}" width="1280" height="720" loading="lazy" decoding="async">`;
   }
@@ -102,7 +107,8 @@ function tarjetaJuego(j, lang, desde) {
   const pie = enlaces
     ? `<div class="game-card__links">${enlaces}</div>`
     : `<p class="game-card__soon"><span class="dot" aria-hidden="true"></span>${lang === 'es' ? 'Anuncio muy pronto' : 'Announcement coming soon'}</p>`;
-  return `<article class="game-card" data-tilt data-reveal>
+  const ancha = juegos.length === 1 ? ' game-card--wide' : '';
+  return `<article class="game-card${ancha}" data-tilt data-reveal>
   <div class="game-card__cover">${portada}<span class="game-card__glare" aria-hidden="true"></span></div>
   <div class="game-card__body">
     <p class="game-card__status"><span class="dot dot--live" aria-hidden="true"></span>${esc(t(j.estado))}</p>
@@ -157,6 +163,7 @@ function pie(p, lang) {
     .map((l) => `<li><a href="${enlace(ruta, l[lang].ruta)}"${l.id === p.id ? ' aria-current="page"' : ''}>${l[lang].corto}</a></li>`)
     .join('');
   return `<footer class="site-footer">
+  ${svgBordeBosque()}
   <div class="container">
     <div class="footer__top">
       <div class="footer__brand">
@@ -196,7 +203,7 @@ function head(p, lang, extra = '') {
 <meta name="description" content="${esc(datos.descripcion)}">
 <meta name="author" content="Jungle Pixel Studio">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#c9c6be">
+<meta name="theme-color" content="#d6dcc8">
 <link rel="canonical" href="${absoluta(datos.ruta)}">
 <link rel="alternate" hreflang="es" href="${alt('es')}">
 <link rel="alternate" hreflang="en" href="${alt('en')}">
@@ -215,6 +222,8 @@ function head(p, lang, extra = '') {
 <link rel="icon" href="${r}favicon.ico" sizes="32x32">
 <link rel="icon" href="${r}favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="${r}apple-touch-icon.png">
+<link rel="preload" href="${r}assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="${r}assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${r}assets/css/main.css">
 <script src="${r}assets/js/early.js"></script>
 <script type="module" src="${r}assets/js/main.js"></script>
@@ -250,6 +259,10 @@ function reemplazar(html, lang, ruta) {
     .replace(/\{\{juegos\}\}/g, () => juegos.map((j) => tarjetaJuego(j, lang, ruta)).join('\n'))
     .replace(/\{\{numJuegos\}\}/g, () => String(juegos.length).padStart(2, '0'))
     .replace(/\{\{hero\}\}/g, () => svgPixel(['JUNGLE', 'PIXEL@'], { clase: 'pixel pixel--hero' }))
+    .replace(/\{\{bosque\}\}/g, () => svgBosque())
+    .replace(/\{\{icono:([^}]+)\}\}/g, (_, ch) => svgPixel([ch], { clase: 'pixel-icon', hueco: 0, nitido: true }))
+    .replace(/\{\{hoja\}\}/g, () => svgPixel(['@'], { clase: 'pixel-icon pixel-icon--leaf', hueco: 0, nitido: true }))
+    .replace(/\{\{claseJuegos\}\}/g, () => (juegos.length > 1 ? 'games__grid--many' : 'games__grid--one'))
     .replace(/\{\{pixel:([^}]+)\}\}/g, (_, txt) => svgPixel([txt], { clase: 'pixel pixel--title' }))
     .replace(/\{\{enlace:([a-z0-9-]+)(#[a-z0-9-]+)?\}\}/g, (_, id, ancla = '') => {
       const destino = pagina(id);
@@ -315,10 +328,11 @@ function pagina404() {
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#c9c6be">
+<meta name="theme-color" content="#d6dcc8">
 <title>404 — Jungle Pixel Studio</title>
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/main.css">
 <script src="/assets/js/early.js"></script>
 <script type="module" src="/assets/js/main.js"></script>
@@ -336,6 +350,7 @@ function pagina404() {
     </div>
   </div>
 </main>
+<div class="not-found__forest">${svgBosque()}</div>
 </body>
 </html>
 `;
@@ -407,6 +422,7 @@ async function main() {
   await rm(OUT, { recursive: true, force: true });
   await mkdir(OUT, { recursive: true });
   await cp(path.join(SRC, 'assets'), path.join(OUT, 'assets'), { recursive: true });
+  if (DEMO) await cp(path.join(SRC, 'demo', 'img'), path.join(OUT, 'assets', 'img', 'demo'), { recursive: true });
   if (await existe(path.join(SRC, 'raiz'))) await cp(path.join(SRC, 'raiz'), OUT, { recursive: true });
 
   let n = 0;
@@ -434,7 +450,7 @@ async function main() {
   await escribir('.nojekyll', '');
   if (sitio.dominioPropio) await escribir('CNAME', sitio.dominioPropio + '\n');
 
-  console.log(`Listo: ${n} páginas + 404, sitemap, robots y security.txt en docs/`);
+  console.log(`Listo: ${n} páginas + 404, sitemap, robots y security.txt en ${DEMO ? "demo/ (PRUEBA LOCAL)" : "docs/"}`);
 }
 
 main().catch((e) => {

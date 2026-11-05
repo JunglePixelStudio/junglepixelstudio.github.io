@@ -19,3 +19,7 @@ node_modules/
 
 # Configuración local de Claude
 .claude/
+
+# Prueba local con portadas (no se publica)
+demo/
+src/demo/
