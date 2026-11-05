@@ -28,51 +28,134 @@ export const sitio = {
   // Fecha de la última revisión de los textos legales.
   fechaLegal: { iso: '2026-11-04', es: '4 de noviembre de 2026', en: 'November 4, 2026' },
 
-  // Redes sociales. Se muestran en el contacto y el pie si hay alguna.
-  // Ejemplo: { nombre: 'YouTube', url: 'https://www.youtube.com/@tucanal' }
-  redes: [],
+  // Redes sociales del estudio. Se muestran en el contacto, en el pie y en los datos para Google.
+  redes: [
+    { nombre: 'itch.io', url: 'https://enmanuel-gutierrez.itch.io/' },
+    { nombre: 'LinkedIn', url: 'https://www.linkedin.com/company/jungle-pixel-studio/' },
+    { nombre: 'X', url: 'https://x.com/_JunglePixel' },
+    { nombre: 'Instagram', url: 'https://www.instagram.com/junglepixelstudio_/' },
+    { nombre: 'TikTok', url: 'https://www.tiktok.com/@jungle_pixel_studio' },
+    { nombre: 'YouTube', url: 'https://www.youtube.com/@JunglePixelStudio' },
+  ],
 };
 
 // ----------------------------------------------------------------------------
-//  JUEGOS
-//  Cada juego es una tarjeta en la portada. Para añadir uno, copia el bloque de
-//  ejemplo del final, rellénalo y pon la imagen en src/assets/img/juegos/.
+//  JUEGOS (en el orden en que aparecen en la portada)
+//  Para añadir uno, copia un bloque, cambia los datos y pon su portada en
+//  src/assets/img/juegos/ (WebP de 756x600; el taller las genera: npm run taller
+//  y abre /herramientas/taller/portadas.html).
+//  Tipos de enlace: itch, googleplay, crazygames, steam, wishlist, trailer, presskit, web.
 // ----------------------------------------------------------------------------
+const accesoAnticipado = { es: 'Acceso anticipado', en: 'Early access' };
+const disponible = { es: 'Disponible', en: 'Out now' };
+
 export const juegos = [
   {
-    id: 'proyecto-01',
-    secreto: true, // tarjeta de "proyecto sin anunciar" con portada animada
-    titulo: { es: 'Proyecto 01', en: 'Project 01' },
-    estado: { es: 'En desarrollo', en: 'In development' },
-    etiquetas: { es: ['PC'], en: ['PC'] },
+    id: 'hoard-sweeper',
+    titulo: 'Hoard Sweeper',
+    estado: accesoAnticipado,
+    etiquetas: { es: ['Acogedor', 'Idle', 'Cooperativo'], en: ['Cozy', 'Idle', 'Co-op'] },
+    plataformas: 'Web · Windows',
     descripcion: {
-      es: 'Algo se está cocinando en la jungla. Nuestro primer juego está en desarrollo y muy pronto lo anunciaremos.',
-      en: 'Something is brewing in the jungle. Our first game is in development and we will announce it very soon.',
+      es: 'Aspira, ordena y cuenta el tesoro de un dragón: ¡100.000 riquezas te esperan!',
+      en: "Vacuum, sort and count down a dragon's hoard of 100,000 treasures.",
+    },
+    imagen: 'assets/img/juegos/hoard-sweeper.webp',
+    enlaces: [{ tipo: 'itch', url: 'https://enmanuel-gutierrez.itch.io/hoard-sweeper' }],
+  },
+  {
+    id: 'trick-or-treat-at-3am',
+    titulo: 'Trick or Treat at 3AM',
+    estado: accesoAnticipado,
+    etiquetas: { es: ['Terror', 'Halloween', 'Primera persona'], en: ['Horror', 'Halloween', 'First person'] },
+    plataformas: 'Web · Windows',
+    descripcion: {
+      es: 'Son las 3 AM de Halloween. Alguien llama a la puerta. No todos son niños.',
+      en: "It's 3 AM on Halloween. Someone is knocking. Not all of them are kids.",
+    },
+    imagen: 'assets/img/juegos/trick-or-treat-at-3am.webp',
+    enlaces: [{ tipo: 'itch', url: 'https://enmanuel-gutierrez.itch.io/trick-or-treat-at-3am' }],
+  },
+  {
+    id: 'puffy-merge-zoo',
+    titulo: 'Puffy Merge Zoo',
+    estado: disponible,
+    etiquetas: { es: ['Puzle', 'Física', 'Relajante'], en: ['Puzzle', 'Physics', 'Relaxing'] },
+    plataformas: 'Android',
+    descripcion: {
+      es: '¡Suelta y combina animalitos kawaii! El puzle de física más tierno y relajante.',
+      en: 'Drop and merge kawaii animals! The cutest and most relaxing physics puzzle.',
+    },
+    imagen: 'assets/img/juegos/puffy-merge-zoo.webp',
+    enlaces: [
+      { tipo: 'googleplay', url: 'https://play.google.com/store/apps/details?id=com.JunglePixel.PuffyZoo' },
+      { tipo: 'itch', url: 'https://enmanuel-gutierrez.itch.io/puffy-merge-zoo' },
+    ],
+  },
+  {
+    id: 'harbor-quest',
+    titulo: 'Harbor Quest',
+    estado: disponible,
+    etiquetas: { es: ['Barcos', 'Simulación', 'Contrarreloj'], en: ['Boats', 'Simulation', 'Time attack'] },
+    plataformas: 'Android',
+    descripcion: {
+      es: 'Rutas de carga contrarreloj. Transporta rápido, gana monedas y amplía tu flota.',
+      en: 'Timed cargo runs. Haul fast, earn coins, and build your fleet!',
+    },
+    imagen: 'assets/img/juegos/harbor-quest.webp',
+    enlaces: [
+      { tipo: 'googleplay', url: 'https://play.google.com/store/apps/details?id=com.junglepixel.harborquest' },
+      { tipo: 'itch', url: 'https://enmanuel-gutierrez.itch.io/harbor-quest' },
+    ],
+  },
+  {
+    id: 'bald-peacock',
+    titulo: 'Bald Peacock',
+    estado: accesoAnticipado,
+    etiquetas: { es: ['Acogedor', 'Clicker', 'Divertido'], en: ['Cozy', 'Clicker', 'Funny'] },
+    plataformas: 'Web · Windows',
+    descripcion: {
+      es: 'Aspira 150.000 plumas y devuélvele la cola a un pavo real calvo y presumido.',
+      en: 'Vacuum 150,000 feathers and give a vain, bald peacock his tail back.',
+    },
+    imagen: 'assets/img/juegos/bald-peacock.webp',
+    enlaces: [{ tipo: 'itch', url: 'https://enmanuel-gutierrez.itch.io/bald-peacock' }],
+  },
+  {
+    id: 'bonk-the-donk',
+    titulo: 'Bonk the Donk',
+    estado: accesoAnticipado,
+    etiquetas: { es: ['Piñatas', 'Clicker', 'Satisfactorio'], en: ['Piñatas', 'Clicker', 'Satisfying'] },
+    plataformas: 'Web · Windows',
+    descripcion: {
+      es: 'Rompe piñatas. Aspira 1.000.000 de caramelos. Dale un buen golpe al Donk gigante.',
+      en: 'Smash piñatas. Suck up 1,000,000 candies. Bonk the giant Donk.',
+    },
+    imagen: 'assets/img/juegos/bonk-the-donk.webp',
+    enlaces: [{ tipo: 'itch', url: 'https://enmanuel-gutierrez.itch.io/bonk-the-donk' }],
+  },
+  {
+    id: 'proximo-proyecto',
+    secreto: true, // tarjeta de "proyecto sin anunciar" con un bosquecito y un "?"
+    titulo: { es: 'Próximo proyecto', en: 'Next project' },
+    estado: { es: 'En desarrollo', en: 'In development' },
+    etiquetas: { es: ['Sin anunciar'], en: ['Unannounced'] },
+    plataformas: 'PC',
+    descripcion: {
+      es: 'Algo más grande se está cocinando en la jungla. Muy pronto lo anunciaremos.',
+      en: "Something bigger is brewing in the jungle. We'll announce it very soon.",
     },
     enlaces: [],
   },
-
-  // EJEMPLO para cuando anuncies un juego (quita las barras // para activarlo):
-  // {
-  //   id: 'mi-juego',
-  //   titulo: { es: 'Mi Juego', en: 'My Game' },
-  //   estado: { es: 'Próximamente en Steam', en: 'Coming soon to Steam' },
-  //   etiquetas: { es: ['Cooperativo', '1–4 jugadores', 'PC'], en: ['Co-op', '1–4 players', 'PC'] },
-  //   descripcion: { es: 'Frase de tienda en español.', en: 'Store line in English.' },
-  //   imagen: 'assets/img/juegos/mi-juego.jpg', // 16:9, unos 1280x720
-  //   imagenAlt: { es: 'Captura de Mi Juego', en: 'Mi Juego screenshot' },
-  //   enlaces: [
-  //     { tipo: 'steam', url: 'https://store.steampowered.com/app/000000/' },
-  //     { tipo: 'trailer', url: 'https://www.youtube.com/watch?v=XXXXXXXX' },
-  //   ],
-  // },
 ];
 
 // Texto de los botones de cada tipo de enlace de juego.
 export const tiposEnlace = {
   steam: { es: 'Ver en Steam', en: 'View on Steam' },
   wishlist: { es: 'Añadir a la lista de deseados', en: 'Wishlist on Steam' },
-  itch: { es: 'Ver en itch.io', en: 'View on itch.io' },
+  itch: { es: 'Jugar en itch.io', en: 'Play on itch.io' },
+  googleplay: { es: 'Google Play', en: 'Google Play' },
+  crazygames: { es: 'Jugar en CrazyGames', en: 'Play on CrazyGames' },
   trailer: { es: 'Ver tráiler', en: 'Watch trailer' },
   presskit: { es: 'Kit de prensa', en: 'Press kit' },
   web: { es: 'Web del juego', en: 'Game website' },

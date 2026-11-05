@@ -5,7 +5,7 @@
 import { readFile, writeFile, mkdir, rm, cp, access } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sitio, juegos as juegosReales, tiposEnlace, paginas, textos } from '../src/sitio.mjs';
+import { sitio, juegos, tiposEnlace, paginas, textos } from '../src/sitio.mjs';
 import { svgPixel } from '../src/pixelfont.mjs';
 import { svgBosque, svgBordeBosque } from '../src/bosque.mjs';
 
@@ -13,10 +13,7 @@ const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(RAIZ, 'src');
 const IDIOMAS = ['es', 'en'];
 
-// DEMO=1 genera una prueba local en demo/ con las portadas de src/demo/ (no se publica).
-const DEMO = process.env.DEMO === '1';
-const OUT = path.join(RAIZ, DEMO ? 'demo' : 'docs');
-const juegos = DEMO ? (await import('../src/demo/juegos-demo.mjs')).juegos : juegosReales;
+const OUT = path.join(RAIZ, 'docs');
 
 // ---------------------------------------------------------------- utilidades
 const esc = (s) =>
@@ -58,11 +55,22 @@ function correo(lang, desde, clase = '') {
   return `<a class="email js-email ${clase}" href="${href}" data-u="${esc(u)}" data-d="${esc(d)}">${esc(u)}<span class="email__at"> ${textos[lang].arroba} </span>${esc(d)}</a>`;
 }
 
+function enlacesRedes(clase) {
+  return sitio.redes
+    .map((r) => `<li><a class="${clase}" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer me">${esc(r.nombre)}<span class="sr-only"> (Jungle Pixel Studio)</span></a></li>`)
+    .join('');
+}
+
+/** Bloque "Síguenos" con botones (contacto). */
 function redes(lang) {
   if (!sitio.redes.length) return '';
-  return `<ul class="social">${sitio.redes
-    .map((r) => `<li><a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer me">${esc(r.nombre)}</a></li>`)
-    .join('')}</ul>`;
+  return `<div class="social"><p class="social__title">${lang === 'es' ? 'Síguenos' : 'Follow us'}</p><ul class="social__list">${enlacesRedes('social__link')}</ul></div>`;
+}
+
+/** Lista sencilla para el pie. */
+function redesPie(lang) {
+  if (!sitio.redes.length) return '';
+  return `<p class="eyebrow footer__social-title">${lang === 'es' ? 'Síguenos' : 'Follow us'}</p><ul class="footer__social">${enlacesRedes('')}</ul>`;
 }
 
 function titular(lang) {
@@ -91,17 +99,19 @@ function bloqueTitular(lang, desde) {
 
 function tarjetaJuego(j, lang, desde) {
   const t = (o) => (typeof o === 'string' ? o : o[lang]);
-  const etiquetas = (j.etiquetas?.[lang] ?? []).map((e) => `<li class="chip">${esc(e)}</li>`).join('');
+  const etiquetas =
+    (j.etiquetas?.[lang] ?? []).map((e) => `<li class="chip">${esc(e)}</li>`).join('') +
+    (j.plataformas ? `<li class="chip chip--plat">${esc(j.plataformas)}</li>` : '');
   let portada;
   if (j.secreto) {
     portada = `<div class="secret" aria-hidden="true">${svgBosque(undefined, 'mini-forest')}${svgPixel(['?'], { clase: 'pixel secret__glyph' })}<span class="secret__label">${lang === 'es' ? 'Sin anunciar' : 'Unannounced'}</span></div>`;
   } else {
-    portada = `<img src="${prefijo(desde)}${esc(j.imagen)}" alt="${esc(t(j.imagenAlt ?? j.titulo))}" width="1280" height="720" loading="lazy" decoding="async">`;
+    portada = `<img src="${prefijo(desde)}${esc(j.imagen)}" alt="${esc(t(j.imagenAlt ?? j.titulo))}" width="756" height="600" loading="lazy" decoding="async">`;
   }
   const enlaces = (j.enlaces ?? [])
     .map(
       (e, i) =>
-        `<a class="btn ${i === 0 ? 'btn--primary' : 'btn--ghost'}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer" data-magnetic><span>${esc(tiposEnlace[e.tipo]?.[lang] ?? e.texto?.[lang] ?? e.url)}</span><span class="btn__arrow" aria-hidden="true">↗</span></a>`
+        `<a class="btn btn--small ${i === 0 ? 'btn--primary' : 'btn--ghost'}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer"><span>${esc(tiposEnlace[e.tipo]?.[lang] ?? e.texto?.[lang] ?? e.url)}</span><span class="sr-only"> — ${esc(t(j.titulo))}</span><span class="btn__arrow" aria-hidden="true">↗</span></a>`
     )
     .join('');
   const pie = enlaces
@@ -182,7 +192,7 @@ function pie(p, lang) {
       <div class="footer__col">
         <p class="eyebrow">${t.contacto}</p>
         <p>${correo(lang, ruta)}</p>
-        ${redes(lang)}
+        ${redesPie(lang)}
       </div>
     </div>
     <div class="footer__big" data-reveal>${svgPixel(['JUNGLE PIXEL'], { clase: 'pixel pixel--footer' })}</div>
@@ -429,7 +439,6 @@ async function main() {
   await rm(OUT, { recursive: true, force: true });
   await mkdir(OUT, { recursive: true });
   await cp(path.join(SRC, 'assets'), path.join(OUT, 'assets'), { recursive: true });
-  if (DEMO) await cp(path.join(SRC, 'demo', 'img'), path.join(OUT, 'assets', 'img', 'demo'), { recursive: true });
   if (await existe(path.join(SRC, 'raiz'))) await cp(path.join(SRC, 'raiz'), OUT, { recursive: true });
 
   let n = 0;
@@ -457,7 +466,7 @@ async function main() {
   await escribir('.nojekyll', '');
   if (sitio.dominioPropio) await escribir('CNAME', sitio.dominioPropio + '\n');
 
-  console.log(`Listo: ${n} páginas + 404, sitemap, robots y security.txt en ${DEMO ? "demo/ (PRUEBA LOCAL)" : "docs/"}`);
+  console.log(`Listo: ${n} páginas + 404, sitemap, robots y security.txt en docs/`);
 }
 
 main().catch((e) => {

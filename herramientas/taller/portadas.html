@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Taller de imágenes — Jungle Pixel Studio</title>
+<link rel="stylesheet" href="fuentes.css">
+<style>
+  body { margin: 0; padding: 24px; font: 15px/1.5 system-ui, sans-serif; background: #d6dcc8; color: #24382c; }
+  h1 { margin: 0 0 8px; font-size: 20px; }
+  #estado { margin: 0 0 16px; font-weight: 700; }
+  .grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  figure { margin: 0; padding: 10px; background: #f4f0e4; border-radius: 12px; }
+  figcaption { font-size: 12px; margin-top: 6px; }
+  canvas { display: block; max-width: 600px; height: auto; background: repeating-conic-gradient(#ddd 0 25%, #fff 0 50%) 0 0 / 16px 16px; }
+</style>
+</head>
+<body>
+<h1>Taller: portadas de juegos</h1>
+<p id="estado">Generando…</p>
+<div class="grid" id="salidas"></div>
+<script type="module" src="portadas.js"></script>
+</body>
+</html>

@@ -23,3 +23,6 @@ node_modules/
 # Prueba local con portadas (no se publica)
 demo/
 src/demo/
+
+# Originales de las portadas (pesados; las versiones web van en src/assets/img/juegos)
+src/marca/portadas/

@@ -2151,3 +2151,103 @@ a {
     font-size: 1.02rem;
   }
 }
+
+/* ============================================ juegos reales y redes sociales */
+.games__grid--many .game-card__cover {
+  aspect-ratio: 630 / 500;
+}
+
+.chip--plat {
+  background: rgba(36, 56, 44, 0.08);
+  color: var(--ink-2);
+}
+
+.game-card__links .btn {
+  --sombra: var(--fern-dark);
+}
+
+.game-card__links .btn--ghost {
+  --sombra: rgba(36, 56, 44, 0.22);
+  background: var(--paper-2);
+}
+
+.social {
+  margin: 0 0 1.75rem;
+}
+
+.social__title {
+  margin: 0 0 0.7rem;
+  font-family: var(--font-round);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--fern);
+}
+
+.social__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  border-radius: 999px;
+  background: var(--paper-2);
+  box-shadow: 0 3px 0 rgba(36, 56, 44, 0.18);
+  font-family: var(--font-round);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    transform 0.35s var(--bounce),
+    box-shadow 0.35s var(--bounce),
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.social__link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 0 var(--fern-dark);
+  background: var(--fern);
+  color: var(--paper);
+}
+
+.footer__col .footer__social-title {
+  margin-top: 1.5rem;
+}
+
+.footer__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.95rem;
+}
+
+.footer__social a {
+  color: var(--night-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer__social a:hover {
+  color: var(--sun);
+}
+
+@media (max-width: 560px) {
+  .letter {
+    padding: 1.9rem 1.35rem;
+  }
+
+  .email--big {
+    font-size: 1.12rem;
+  }
+}
