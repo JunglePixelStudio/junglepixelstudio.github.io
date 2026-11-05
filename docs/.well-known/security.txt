@@ -1,0 +1,7 @@
+# Jungle Pixel Studio — política: https://junglepixelstudio.github.io/legal/seguridad.html
+Contact: mailto:junglepixel2024@gmail.com
+Expires: 2027-10-30T00:00:00.000Z
+Preferred-Languages: es, en
+Canonical: https://junglepixelstudio.github.io/.well-known/security.txt
+Policy: https://junglepixelstudio.github.io/legal/seguridad.html
+Policy: https://junglepixelstudio.github.io/en/legal/security.html

@@ -1,0 +1,21 @@
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editores
+.vscode/
+.idea/
+*.swp
+
+# Nunca subir secretos
+.env
+.env.*
+*.pem
+*.key
+
+# Node (no usamos dependencias, pero por si acaso)
+node_modules/
+
+# Configuración local de Claude
+.claude/
