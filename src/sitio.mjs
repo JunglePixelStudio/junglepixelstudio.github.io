@@ -44,7 +44,7 @@ export const juegos = [
     secreto: true, // tarjeta de "proyecto sin anunciar" con portada animada
     titulo: { es: 'Proyecto 01', en: 'Project 01' },
     estado: { es: 'En desarrollo', en: 'In development' },
-    etiquetas: { es: ['Sin anunciar', 'PC'], en: ['Unannounced', 'PC'] },
+    etiquetas: { es: ['PC'], en: ['PC'] },
     descripcion: {
       es: 'Algo se está cocinando en la jungla. Nuestro primer juego está en desarrollo y muy pronto lo anunciaremos.',
       en: 'Something is brewing in the jungle. Our first game is in development and we will announce it very soon.',

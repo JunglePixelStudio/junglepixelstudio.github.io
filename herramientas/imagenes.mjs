@@ -106,9 +106,9 @@ function texto(img, lineas, x, y, escala, color, hueco = 0) {
 }
 
 // --------------------------------------------------------------- piezas
-const FONDO = '#0a0f0b';
-const TEXTO = '#e9f0e6';
-const LIMA = '#c6ff3d';
+const FONDO = '#c9c6be';
+const TEXTO = '#1c1c1a';
+const LIMA = '#3c6a4e';
 
 function favicon(tam) {
   const img = lienzo(tam, tam);
@@ -129,19 +129,19 @@ function og() {
   const H = 630;
   const img = lienzo(W, H, FONDO);
   // rejilla de puntos
-  for (let x = 24; x < W; x += 48) for (let y = 15; y < H; y += 48) rect(img, x - 1, y - 1, 2, 2, TEXTO, 0.08);
+  for (let x = 24; x < W; x += 48) for (let y = 15; y < H; y += 48) rect(img, x - 1, y - 1, 2, 2, TEXTO, 0.14);
   // pixeles sueltos (luciérnagas)
   let semilla = 7;
   const azar = () => ((semilla = (semilla * 16807) % 2147483647) / 2147483647);
   for (let i = 0; i < 60; i++) {
     const s = azar() < 0.7 ? 6 : 9;
-    const col = [LIMA, '#3fd174', '#8ce678'][(azar() * 3) | 0];
-    rect(img, 80 + azar() * 1040, 40 + azar() * 550, s, s, col, 0.15 + azar() * 0.5);
+    const col = [LIMA, '#7c9f5c', TEXTO][(azar() * 3) | 0];
+    rect(img, 80 + azar() * 1040, 40 + azar() * 550, s, s, col, 0.08 + azar() * 0.25);
   }
   const esc = 20;
   texto(img, ['JUNGLE', 'PIXEL@'], 90, 110, esc, TEXTO, 2);
   texto(img, ['STUDIO'], 90 + 0, 110 + 16 * esc + 40, 8, LIMA, 1);
-  texto(img, ['INDIE GAMES - COLOMBIA'], 90, 560, 3, '#93a096');
+  texto(img, ['INDIE GAMES - COLOMBIA'], 90, 560, 3, '#4f4d47');
   return png(img);
 }
 
@@ -181,5 +181,4 @@ await guardar('raiz/favicon.ico', ico([{ tam: 16, datos: favicon(16) }, { tam: 3
 await guardar('raiz/favicon.svg', faviconSvg());
 await guardar('raiz/apple-touch-icon.png', appleIcon());
 await guardar('assets/img/og.png', og());
-await guardar('assets/img/noise.png', ruido());
 console.log('Listo.');

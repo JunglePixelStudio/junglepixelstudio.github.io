@@ -89,7 +89,7 @@ function tarjetaJuego(j, lang, desde) {
   const etiquetas = (j.etiquetas?.[lang] ?? []).map((e) => `<li class="chip">${esc(e)}</li>`).join('');
   let portada;
   if (j.secreto) {
-    portada = `<div class="secret" aria-hidden="true"><div class="secret__noise"></div><div class="secret__scan"></div>${svgPixel(['?'], { clase: 'pixel secret__glyph' })}<span class="secret__stamp">${lang === 'es' ? 'Clasificado' : 'Classified'}</span></div>`;
+    portada = `<div class="secret" aria-hidden="true">${svgPixel(['?'], { clase: 'pixel secret__glyph' })}<span class="secret__label">${lang === 'es' ? 'Sin anunciar' : 'Unannounced'}</span></div>`;
   } else {
     portada = `<img src="${prefijo(desde)}${esc(j.imagen)}" alt="${esc(t(j.imagenAlt ?? j.titulo))}" width="1280" height="720" loading="lazy" decoding="async">`;
   }
@@ -195,8 +195,8 @@ function head(p, lang, extra = '') {
 <title>${esc(datos.titulo)}${p.tipo === 'legal' ? ' — Jungle Pixel Studio' : ''}</title>
 <meta name="description" content="${esc(datos.descripcion)}">
 <meta name="author" content="Jungle Pixel Studio">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0a0f0b">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#c9c6be">
 <link rel="canonical" href="${absoluta(datos.ruta)}">
 <link rel="alternate" hreflang="es" href="${alt('es')}">
 <link rel="alternate" hreflang="en" href="${alt('en')}">
@@ -314,8 +314,8 @@ function pagina404() {
 <meta http-equiv="Content-Security-Policy" content="${CSP}">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="noindex">
-<meta name="color-scheme" content="dark">
-<meta name="theme-color" content="#0a0f0b">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#c9c6be">
 <title>404 — Jungle Pixel Studio</title>
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">

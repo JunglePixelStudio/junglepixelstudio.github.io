@@ -293,9 +293,21 @@ function initHero() {
   }
 
   const vb = svg.viewBox.baseVal;
-  const BASE = { '': [233, 240, 230], a: [198, 255, 61], b: [63, 209, 116], c: [35, 135, 74] };
-  const HOT = { '': [198, 255, 61], a: [255, 255, 255], b: [214, 255, 150], c: [120, 220, 140] };
-  const FIREFLY = [[198, 255, 61], [63, 209, 116], [140, 230, 120]];
+  // Los colores salen de las variables CSS (--px, --px-hot, --leaf-*), así la paleta se cambia solo en el CSS.
+  const css = getComputedStyle(html);
+  const color = (name, fallback) => {
+    const v = css.getPropertyValue(name).trim();
+    const m = /^#([0-9a-f]{6})$/i.exec(v);
+    if (!m) return fallback;
+    const n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  };
+  const INK = color('--px', [28, 28, 26]);
+  const HOTC = color('--px-hot', [60, 106, 78]);
+  const LEAF_HOT = color('--leaf-hot', [168, 201, 139]);
+  const BASE = { '': INK, a: color('--leaf-a', [124, 159, 92]), b: color('--leaf-b', [78, 124, 87]), c: color('--leaf-c', [47, 82, 64]) };
+  const HOT = { '': HOTC, a: LEAF_HOT, b: LEAF_HOT, c: LEAF_HOT };
+  const FIREFLY = [INK, HOTC, BASE.a];
 
   const parts = $$('rect', svg).map((r) => {
     const cls = r.getAttribute('class') || '';
@@ -348,10 +360,10 @@ function initHero() {
       p.hx = ox + p.gx * cell;
       p.hy = oy + p.gy * cell;
     }
-    // la rejilla CSS (48px) está centrada: alineamos los puntos de luz con sus cruces
+    // la rejilla de puntos CSS (48px) está centrada: alineamos los puntos que se encienden con ella
     gridOX = (W / 2) % 48;
     gridOY = (H / 2) % 48;
-    const n = W < 700 ? 16 : 34;
+    const n = W < 700 ? 8 : 16;
     while (flies.length < n) flies.push(newFly(true));
     flies.length = n;
     if (!started) {
@@ -421,9 +433,9 @@ function initHero() {
           const d = Math.hypot(gx - mx, gy - my);
           if (d > R0) continue;
           const f = 1 - d / R0;
-          const s = 2 + Math.round(f * 4);
-          ctx.globalAlpha = f * 0.55 * fade;
-          ctx.fillStyle = '#3fd174';
+          const s = 2 + Math.round(f * 3);
+          ctx.globalAlpha = f * 0.6 * fade;
+          ctx.fillStyle = `rgb(${HOTC[0]},${HOTC[1]},${HOTC[2]})`;
           ctx.fillRect(Math.round(gx - s / 2), Math.round(gy - s / 2), s, s);
         }
       }
@@ -440,7 +452,7 @@ function initHero() {
       f.dx *= Math.pow(0.95, dt);
       f.x += (Math.sin(f.ph) * 0.25 + f.dx) * dt;
       if (f.y < -10 || f.x < -20 || f.x > W + 20) Object.assign(f, newFly(false));
-      const a = (0.25 + 0.45 * (0.5 + 0.5 * Math.sin(f.ph * 3))) * fade;
+      const a = (0.12 + 0.28 * (0.5 + 0.5 * Math.sin(f.ph * 3))) * fade;
       ctx.globalAlpha = clamp(a, 0, 1);
       ctx.fillStyle = `rgb(${f.c[0]},${f.c[1]},${f.c[2]})`;
       ctx.fillRect(Math.round(f.x), Math.round(f.y), f.s, f.s);
@@ -480,34 +492,6 @@ function initHero() {
   });
 }
 
-// --------------------------------------------------------------- marquesina
-function initMarquee() {
-  const wrap = $('[data-marquee]');
-  const track = $('[data-marquee-track]');
-  if (!track || reduce) {
-    if (track) track.style.animation = 'none';
-    return;
-  }
-  let x = 0;
-  let half = track.scrollWidth / 2;
-  let dir = 1;
-  let skew = 0;
-  let visible = true;
-  new ResizeObserver(() => (half = track.scrollWidth / 2)).observe(track);
-  new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(wrap);
-  updaters.push((dt) => {
-    if (!visible) return;
-    const v = clamp(scrollVel, -80, 80);
-    if (v > 0.5) dir = 1;
-    else if (v < -0.5) dir = -1;
-    x -= (0.7 + Math.abs(v) * 0.4) * dt * dir;
-    if (x <= -half) x += half;
-    if (x > 0) x -= half;
-    skew = lerp(skew, clamp(v * 0.18, -8, 8), 0.12);
-    track.style.transform = `translate3d(${x.toFixed(2)}px,0,0) skewX(${(-skew).toFixed(2)}deg)`;
-  });
-}
-
 // --------------------------------------------------- manifiesto palabra a palabra
 function initWords() {
   const el = $('[data-words]');
@@ -544,64 +528,11 @@ function initWords() {
   });
 }
 
-// ------------------------------------------------- proceso en horizontal
-function initProcess() {
-  const sec = $('[data-process]');
-  if (!sec) return;
-  const track = $('[data-process-track]', sec);
-  const steps = $$('.step', sec);
-  const mq = window.matchMedia('(min-width: 861px)');
-  let enabled = false;
-  let dist = 0;
-
-  const setup = () => {
-    enabled = mq.matches && !reduce;
-    sec.classList.toggle('is-horizontal', enabled);
-    if (!enabled) {
-      sec.style.height = '';
-      track.style.transform = '';
-      return;
-    }
-    dist = Math.max(0, track.scrollWidth - window.innerWidth);
-    sec.style.height = `${window.innerHeight + dist}px`;
-  };
-  setup();
-  window.addEventListener('resize', setup);
-  mq.addEventListener('change', setup);
-
-  let lastActive = -1;
-  updaters.push(() => {
-    const r = sec.getBoundingClientRect();
-    const vh = window.innerHeight;
-    if (r.bottom < 0 || r.top > vh) return;
-    if (enabled) {
-      const p = clamp(-r.top / Math.max(1, sec.offsetHeight - vh), 0, 1);
-      track.style.transform = `translate3d(${(-p * dist).toFixed(1)}px,0,0)`;
-    }
-    const cx = window.innerWidth / 2;
-    const cy = vh / 2;
-    let best = 0;
-    let bestD = Infinity;
-    steps.forEach((s, i) => {
-      const b = s.getBoundingClientRect();
-      const d = Math.hypot(b.left + b.width / 2 - cx, (b.top + b.height / 2 - cy) * (enabled ? 0 : 1));
-      if (d < bestD) {
-        bestD = d;
-        best = i;
-      }
-    });
-    if (best !== lastActive) {
-      steps.forEach((s, i) => s.classList.toggle('is-active', i === best));
-      lastActive = best;
-    }
-  });
-}
-
 // ------------------------------------------------ tarjetas que se inclinan
 function initTilt() {
   if (!finePointer || reduce) return;
   $$('[data-tilt]').forEach((el) => {
-    const max = el.classList.contains('game-card') ? 5 : 8;
+    const max = 4;
     el.addEventListener('pointerenter', () => {
       el.style.transition = 'transform .18s ease-out, border-color .3s ease';
     });
@@ -740,7 +671,7 @@ function initLoop() {
 }
 
 // ------------------------------------------------------------------ inicio
-const inits = [initEmail, initYear, initHeader, initMenu, initActiveNav, initReveal, initPixelTitles, initHero, initMarquee, initWords, initProcess, initTilt, initMagnetic, initCursor, initToc];
+const inits = [initEmail, initYear, initHeader, initMenu, initActiveNav, initReveal, initPixelTitles, initHero, initWords, initTilt, initMagnetic, initCursor, initToc];
 for (const init of inits) {
   try {
     init();

@@ -117,4 +117,4 @@ export function svgPixel(lineas, op = {}) {
   return `<svg class="${clase}" viewBox="0 0 ${ancho} ${alto}" aria-hidden="true" focusable="false"${render}>${rects}</svg>`;
 }
 
-export const COLORES_HOJA = { a: '#c6ff3d', b: '#3fd174', c: '#23874a' };
+export const COLORES_HOJA = { a: '#7c9f5c', b: '#4e7c57', c: '#2f5240' };
