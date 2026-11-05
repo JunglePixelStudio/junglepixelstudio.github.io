@@ -2012,3 +2012,142 @@ a {
     color: #000;
   }
 }
+
+/* ===================================================== logotipo del estudio */
+.brand {
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+}
+
+.brand__logo {
+  width: 46px;
+  height: 46px;
+  filter: drop-shadow(0 3px 4px rgba(36, 56, 44, 0.25));
+  transition: transform 0.5s var(--bounce);
+}
+
+.brand:hover .brand__logo {
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.brand__name {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-round);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.brand__name small {
+  margin-top: 0.2em;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fern);
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  grid-template-areas: 'text logo';
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.hero__grid .hero__inner {
+  grid-area: text;
+  max-width: none;
+}
+
+.hero__grid .hero__title {
+  font-size: clamp(2.7rem, 5.6vw, 5.2rem);
+}
+
+.hero__logo {
+  grid-area: logo;
+  justify-self: center;
+  width: clamp(220px, 29vw, 400px);
+  will-change: transform;
+}
+
+.hero__logo img {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 28px 26px rgba(36, 56, 44, 0.3));
+  animation: flotar-logo 6s ease-in-out infinite;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.hero__logo.is-jump img {
+  animation: salto 0.7s var(--bounce);
+}
+
+@keyframes flotar-logo {
+  50% {
+    transform: translateY(-12px) rotate(1.5deg);
+  }
+}
+
+@keyframes salto {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  25% {
+    transform: translateY(6px) scale(1.06, 0.92);
+  }
+  55% {
+    transform: translateY(-34px) scale(0.96, 1.05) rotate(-4deg);
+  }
+  80% {
+    transform: translateY(0) scale(1.03, 0.97);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+.footer__logo {
+  flex: none;
+  width: 64px;
+  height: 64px;
+}
+
+.letter__stamp img {
+  width: 62px;
+  height: auto;
+}
+
+@media (max-width: 860px) {
+  .hero__grid {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'logo' 'text';
+    gap: 0.5rem;
+  }
+
+  .hero__logo {
+    justify-self: start;
+    width: clamp(120px, 34vw, 180px);
+  }
+}
+
+@media (max-width: 760px) {
+  .letter__stamp img {
+    width: 46px;
+  }
+}
+
+@media (max-width: 560px) {
+  .brand__logo {
+    width: 40px;
+    height: 40px;
+  }
+
+  .brand__name {
+    font-size: 1.02rem;
+  }
+}

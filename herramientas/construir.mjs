@@ -120,6 +120,11 @@ function tarjetaJuego(j, lang, desde) {
 </article>`;
 }
 
+// Logotipo + nombre (cabecera y 404)
+function marca(r) {
+  return `<img class="brand__logo" src="${r}assets/img/logo/logo-160.webp" width="160" height="160" alt="" decoding="async"><span class="brand__name">Jungle Pixel<small>Studio</small></span>`;
+}
+
 // ---------------------------------------------------------------- plantilla
 function cabecera(p, lang) {
   const t = textos[lang];
@@ -141,7 +146,7 @@ function cabecera(p, lang) {
 <div class="progress" aria-hidden="true"><span data-progress></span></div>
 <header class="site-header" data-header>
   <div class="container site-header__inner">
-    <a class="brand" href="${enlace(ruta, inicio)}" aria-label="Jungle Pixel Studio — ${t.inicio}" data-magnetic>${svgPixel(['@ JUNGLE PIXEL'], { clase: 'brand__svg', hueco: 0, nitido: true })}</a>
+    <a class="brand" href="${enlace(ruta, inicio)}" aria-label="Jungle Pixel Studio — ${t.inicio}">${marca(prefijo(ruta))}</a>
     <nav class="nav" aria-label="${lang === 'es' ? 'Principal' : 'Main'}"><ul>${nav}</ul></nav>
     ${idiomas}
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-movil" data-menu-toggle>
@@ -167,7 +172,7 @@ function pie(p, lang) {
   <div class="container">
     <div class="footer__top">
       <div class="footer__brand">
-        ${svgPixel(['@'], { clase: 'footer__leaf', hueco: 0, nitido: true })}
+        <img class="footer__logo" src="${prefijo(ruta)}assets/img/logo/logo-160.webp" width="160" height="160" alt="" loading="lazy" decoding="async">
         <p><strong>Jungle Pixel Studio™</strong><br>${t.lema}<br>${t.hecho}</p>
       </div>
       <nav class="footer__col" aria-label="${t.legal}">
@@ -219,8 +224,8 @@ function head(p, lang, extra = '') {
 <meta property="og:image:alt" content="Jungle Pixel Studio">
 <meta property="og:locale" content="${lang === 'es' ? 'es_CO' : 'en_US'}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="${r}favicon.ico" sizes="32x32">
-<link rel="icon" href="${r}favicon.svg" type="image/svg+xml">
+<link rel="icon" href="${r}favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="${r}favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="${r}apple-touch-icon.png">
 <link rel="preload" href="${r}assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${r}assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
@@ -261,6 +266,8 @@ function reemplazar(html, lang, ruta) {
     .replace(/\{\{hero\}\}/g, () => svgPixel(['JUNGLE', 'PIXEL@'], { clase: 'pixel pixel--hero' }))
     .replace(/\{\{bosque\}\}/g, () => svgBosque())
     .replace(/\{\{icono:([^}]+)\}\}/g, (_, ch) => svgPixel([ch], { clase: 'pixel-icon', hueco: 0, nitido: true }))
+    .replace(/\{\{logo-portada\}\}/g, () => `<div class="hero__logo" data-hero-logo><img src="${prefijo(ruta)}assets/img/logo/logo-480.webp" width="480" height="480" alt="${lang === 'es' ? 'Logotipo de Jungle Pixel Studio: un mono con un mando entre hojas de la jungla' : 'Jungle Pixel Studio logo: a monkey holding a game controller among jungle leaves'}" fetchpriority="high" decoding="async"></div>`)
+    .replace(/\{\{logo-sello\}\}/g, () => `<img src="${prefijo(ruta)}assets/img/logo/logo-160.webp" width="160" height="160" alt="" loading="lazy" decoding="async">`)
     .replace(/\{\{hoja\}\}/g, () => svgPixel(['@'], { clase: 'pixel-icon pixel-icon--leaf', hueco: 0, nitido: true }))
     .replace(/\{\{claseJuegos\}\}/g, () => (juegos.length > 1 ? 'games__grid--many' : 'games__grid--one'))
     .replace(/\{\{pixel:([^}]+)\}\}/g, (_, txt) => svgPixel([txt], { clase: 'pixel pixel--title' }))
@@ -308,9 +315,9 @@ function jsonLd() {
     '@type': 'Organization',
     name: 'Jungle Pixel Studio',
     url: `${sitio.url}/`,
-    logo: `${sitio.url}/apple-touch-icon.png`,
+    logo: `${sitio.url}/assets/img/logo/logo-512.png`,
     email: sitio.correo,
-    description: 'Independent video game studio from Colombia.',
+    description: 'Independent video game studio from Colombia and Venezuela.',
     address: { '@type': 'PostalAddress', addressCountry: 'CO' },
     sameAs: sitio.redes.map((r) => r.url),
   };
@@ -330,8 +337,8 @@ function pagina404() {
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#d6dcc8">
 <title>404 — Jungle Pixel Studio</title>
-<link rel="icon" href="/favicon.ico" sizes="32x32">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/main.css">
 <script src="/assets/js/early.js"></script>
@@ -340,7 +347,7 @@ function pagina404() {
 <body class="page-404" id="top">
 <main id="contenido" class="not-found">
   <div class="container not-found__inner">
-    <a class="brand" href="/" aria-label="Jungle Pixel Studio">${svgPixel(['@ JUNGLE PIXEL'], { clase: 'brand__svg', hueco: 0, nitido: true })}</a>
+    <a class="brand" href="/" aria-label="Jungle Pixel Studio">${marca('/')}</a>
     <h1 class="not-found__title"><span class="sr-only">404</span>${svgPixel(['404'], { clase: 'pixel pixel--title pixel--404' })}</h1>
     <p class="not-found__text" lang="es">Esta página se perdió en la jungla.</p>
     <p class="not-found__text not-found__text--en" lang="en">This page got lost in the jungle.</p>

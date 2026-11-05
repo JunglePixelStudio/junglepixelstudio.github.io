@@ -307,6 +307,42 @@ function initForest() {
     });
   }
 
+  // El logo mira hacia el ratón (se inclina) y salta si le haces clic
+  const logo = $('[data-hero-logo]', hero);
+  if (logo && !reduce) {
+    let rx = 0;
+    let ry = 0;
+    let tx = 0;
+    let ty = 0;
+    logo.addEventListener('click', () => {
+      logo.classList.remove('is-jump');
+      void logo.offsetWidth;
+      logo.classList.add('is-jump');
+    });
+    logo.addEventListener('animationend', () => logo.classList.remove('is-jump'));
+    updaters.push(() => {
+      if (!visible) return;
+      let trx = 0;
+      let try_ = 0;
+      let ttx = 0;
+      let tty = 0;
+      if (pointer.seen && finePointer) {
+        const b = logo.getBoundingClientRect();
+        const dx = (pointer.x - (b.left + b.width / 2)) / window.innerWidth;
+        const dy = (pointer.y - (b.top + b.height / 2)) / window.innerHeight;
+        try_ = clamp(dx * 28, -14, 14);
+        trx = clamp(-dy * 22, -12, 12);
+        ttx = clamp(dx * 18, -12, 12);
+        tty = clamp(dy * 12, -10, 10);
+      }
+      rx = lerp(rx, trx, 0.08);
+      ry = lerp(ry, try_, 0.08);
+      tx = lerp(tx, ttx, 0.08);
+      ty = lerp(ty, tty - scrollY * 0.12, 0.2);
+      logo.style.transform = `perspective(900px) translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+    });
+  }
+
   // Letras del título que rebotan al acercar el ratón
   const title = $('[data-letters]', hero);
   if (title && !reduce) {
@@ -645,7 +681,7 @@ function initCursor() {
   window.addEventListener('pointerdown', () => ring.classList.add('is-down'));
   window.addEventListener('pointerup', () => ring.classList.remove('is-down'));
   document.addEventListener('pointerover', (e) => {
-    const hit = e.target.closest('a, button, summary, [data-tilt], [data-copy-email]');
+    const hit = e.target.closest('a, button, summary, [data-tilt], [data-copy-email], [data-hero-logo]');
     ring.classList.toggle('is-hover', !!hit);
   });
   document.addEventListener('pointerleave', () => [dot, ring, spot].forEach((n) => n.classList.remove('is-visible')));

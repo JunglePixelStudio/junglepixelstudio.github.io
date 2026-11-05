@@ -89,13 +89,13 @@ export const paginas = [
       ruta: 'index.html',
       titulo: 'Jungle Pixel Studio — Estudio independiente de videojuegos',
       descripcion:
-        'Jungle Pixel Studio es un estudio independiente de videojuegos de Colombia. Hacemos juegos para jugar con amigos, reír cuando todo sale mal y pedir otra partida.',
+        'Jungle Pixel Studio es un estudio independiente de videojuegos de Colombia y Venezuela. Hacemos juegos para jugar con amigos, reír cuando todo sale mal y pedir otra partida.',
     },
     en: {
       ruta: 'en/index.html',
       titulo: 'Jungle Pixel Studio — Independent game studio',
       descripcion:
-        'Jungle Pixel Studio is an independent video game studio from Colombia. We make games to play with friends, laugh when everything goes wrong and ask for one more round.',
+        'Jungle Pixel Studio is an independent video game studio from Colombia and Venezuela. We make games to play with friends, laugh when everything goes wrong and ask for one more round.',
     },
   },
   {
@@ -149,7 +149,7 @@ export const textos = {
     idioma: 'Idioma',
     idiomaOtro: 'English',
     lema: 'Estudio independiente de videojuegos.',
-    hecho: 'Hecho a mano en Colombia.',
+    hecho: 'Hecho a mano en Colombia, con corazón venezolano.',
     derechos: 'Todos los derechos reservados.',
     marcas: 'Jungle Pixel Studio y su logotipo son signos distintivos de su titular.',
     legal: 'Legal',
@@ -172,7 +172,7 @@ export const textos = {
     idioma: 'Language',
     idiomaOtro: 'Español',
     lema: 'Independent video game studio.',
-    hecho: 'Handcrafted in Colombia.',
+    hecho: 'Handcrafted in Colombia, with a Venezuelan heart.',
     derechos: 'All rights reserved.',
     marcas: 'Jungle Pixel Studio and its logo are trademarks of their owner.',
     legal: 'Legal',

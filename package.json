@@ -5,7 +5,8 @@
   "description": "Web oficial de Jungle Pixel Studio. Sitio estático sin dependencias.",
   "scripts": {
     "construir": "node herramientas/construir.mjs",
-    "imagenes": "node herramientas/imagenes.mjs",
-    "servidor": "node herramientas/servidor.mjs"
+    "servidor": "node herramientas/servidor.mjs",
+    "taller": "node herramientas/taller/servidor-taller.mjs",
+    "favicon": "node herramientas/favicon.mjs"
   }
 }
