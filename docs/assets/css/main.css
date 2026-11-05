@@ -2251,3 +2251,101 @@ a {
     font-size: 1.12rem;
   }
 }
+
+/* ===================================================== iconos de marcas */
+.sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.icon {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  fill: currentColor;
+}
+
+.btn .icon {
+  width: 1.15em;
+  height: 1.15em;
+  margin-left: -0.15em;
+}
+
+.chip--plat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.chip--plat .icon {
+  width: 1.05em;
+  height: 1.05em;
+}
+
+.social__link {
+  gap: 0.5em;
+}
+
+.social__link .icon {
+  color: var(--c, currentColor);
+  transition: color 0.25s ease;
+}
+
+.social__link:hover .icon {
+  color: var(--paper);
+}
+
+.red--itchdotio {
+  --c: #fa5c5c;
+}
+
+.red--linkedin {
+  --c: #0a66c2;
+}
+
+.red--x {
+  --c: #000;
+}
+
+.red--instagram {
+  --c: #e1306c;
+}
+
+.red--tiktok {
+  --c: #000;
+}
+
+.red--youtube {
+  --c: #ff0000;
+}
+
+.footer__social {
+  gap: 0.5rem;
+}
+
+.footer__social-link {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(233, 230, 214, 0.08);
+  color: var(--night-ink);
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.35s var(--bounce);
+}
+
+.footer__social a.footer__social-link:hover {
+  background: var(--sun);
+  color: var(--night);
+  transform: translateY(-3px);
+}
+
+.footer__social-link .icon {
+  width: 20px;
+  height: 20px;
+}

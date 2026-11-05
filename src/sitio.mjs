@@ -30,12 +30,12 @@ export const sitio = {
 
   // Redes sociales del estudio. Se muestran en el contacto, en el pie y en los datos para Google.
   redes: [
-    { nombre: 'itch.io', url: 'https://enmanuel-gutierrez.itch.io/' },
-    { nombre: 'LinkedIn', url: 'https://www.linkedin.com/company/jungle-pixel-studio/' },
-    { nombre: 'X', url: 'https://x.com/_JunglePixel' },
-    { nombre: 'Instagram', url: 'https://www.instagram.com/junglepixelstudio_/' },
-    { nombre: 'TikTok', url: 'https://www.tiktok.com/@jungle_pixel_studio' },
-    { nombre: 'YouTube', url: 'https://www.youtube.com/@JunglePixelStudio' },
+    { nombre: 'itch.io', icono: 'itchdotio', url: 'https://enmanuel-gutierrez.itch.io/' },
+    { nombre: 'LinkedIn', icono: 'linkedin', url: 'https://www.linkedin.com/company/jungle-pixel-studio/' },
+    { nombre: 'X', icono: 'x', url: 'https://x.com/_JunglePixel' },
+    { nombre: 'Instagram', icono: 'instagram', url: 'https://www.instagram.com/junglepixelstudio_/' },
+    { nombre: 'TikTok', icono: 'tiktok', url: 'https://www.tiktok.com/@jungle_pixel_studio' },
+    { nombre: 'YouTube', icono: 'youtube', url: 'https://www.youtube.com/@JunglePixelStudio' },
   ],
 };
 
@@ -45,6 +45,7 @@ export const sitio = {
 //  src/assets/img/juegos/ (WebP de 756x600; el taller las genera: npm run taller
 //  y abre /herramientas/taller/portadas.html).
 //  Tipos de enlace: itch, googleplay, crazygames, steam, wishlist, trailer, presskit, web.
+//  Plataformas: web, windows, android, pc (ver "plataformas" más abajo).
 // ----------------------------------------------------------------------------
 const accesoAnticipado = { es: 'Acceso anticipado', en: 'Early access' };
 const disponible = { es: 'Disponible', en: 'Out now' };
@@ -55,7 +56,7 @@ export const juegos = [
     titulo: 'Hoard Sweeper',
     estado: accesoAnticipado,
     etiquetas: { es: ['Acogedor', 'Idle', 'Cooperativo'], en: ['Cozy', 'Idle', 'Co-op'] },
-    plataformas: 'Web · Windows',
+    plataformas: ['web', 'windows'],
     descripcion: {
       es: 'Aspira, ordena y cuenta el tesoro de un dragón: ¡100.000 riquezas te esperan!',
       en: "Vacuum, sort and count down a dragon's hoard of 100,000 treasures.",
@@ -68,7 +69,7 @@ export const juegos = [
     titulo: 'Trick or Treat at 3AM',
     estado: accesoAnticipado,
     etiquetas: { es: ['Terror', 'Halloween', 'Primera persona'], en: ['Horror', 'Halloween', 'First person'] },
-    plataformas: 'Web · Windows',
+    plataformas: ['web', 'windows'],
     descripcion: {
       es: 'Son las 3 AM de Halloween. Alguien llama a la puerta. No todos son niños.',
       en: "It's 3 AM on Halloween. Someone is knocking. Not all of them are kids.",
@@ -81,7 +82,7 @@ export const juegos = [
     titulo: 'Puffy Merge Zoo',
     estado: disponible,
     etiquetas: { es: ['Puzle', 'Física', 'Relajante'], en: ['Puzzle', 'Physics', 'Relaxing'] },
-    plataformas: 'Android',
+    plataformas: ['android'],
     descripcion: {
       es: '¡Suelta y combina animalitos kawaii! El puzle de física más tierno y relajante.',
       en: 'Drop and merge kawaii animals! The cutest and most relaxing physics puzzle.',
@@ -97,7 +98,7 @@ export const juegos = [
     titulo: 'Harbor Quest',
     estado: disponible,
     etiquetas: { es: ['Barcos', 'Simulación', 'Contrarreloj'], en: ['Boats', 'Simulation', 'Time attack'] },
-    plataformas: 'Android',
+    plataformas: ['android'],
     descripcion: {
       es: 'Rutas de carga contrarreloj. Transporta rápido, gana monedas y amplía tu flota.',
       en: 'Timed cargo runs. Haul fast, earn coins, and build your fleet!',
@@ -113,7 +114,7 @@ export const juegos = [
     titulo: 'Bald Peacock',
     estado: accesoAnticipado,
     etiquetas: { es: ['Acogedor', 'Clicker', 'Divertido'], en: ['Cozy', 'Clicker', 'Funny'] },
-    plataformas: 'Web · Windows',
+    plataformas: ['web', 'windows'],
     descripcion: {
       es: 'Aspira 150.000 plumas y devuélvele la cola a un pavo real calvo y presumido.',
       en: 'Vacuum 150,000 feathers and give a vain, bald peacock his tail back.',
@@ -126,7 +127,7 @@ export const juegos = [
     titulo: 'Bonk the Donk',
     estado: accesoAnticipado,
     etiquetas: { es: ['Piñatas', 'Clicker', 'Satisfactorio'], en: ['Piñatas', 'Clicker', 'Satisfying'] },
-    plataformas: 'Web · Windows',
+    plataformas: ['web', 'windows'],
     descripcion: {
       es: 'Rompe piñatas. Aspira 1.000.000 de caramelos. Dale un buen golpe al Donk gigante.',
       en: 'Smash piñatas. Suck up 1,000,000 candies. Bonk the giant Donk.',
@@ -140,7 +141,7 @@ export const juegos = [
     titulo: { es: 'Próximo proyecto', en: 'Next project' },
     estado: { es: 'En desarrollo', en: 'In development' },
     etiquetas: { es: ['Sin anunciar'], en: ['Unannounced'] },
-    plataformas: 'PC',
+    plataformas: ['pc'],
     descripcion: {
       es: 'Algo más grande se está cocinando en la jungla. Muy pronto lo anunciaremos.',
       en: "Something bigger is brewing in the jungle. We'll announce it very soon.",
@@ -151,14 +152,22 @@ export const juegos = [
 
 // Texto de los botones de cada tipo de enlace de juego.
 export const tiposEnlace = {
-  steam: { es: 'Ver en Steam', en: 'View on Steam' },
-  wishlist: { es: 'Añadir a la lista de deseados', en: 'Wishlist on Steam' },
-  itch: { es: 'Jugar en itch.io', en: 'Play on itch.io' },
-  googleplay: { es: 'Google Play', en: 'Google Play' },
-  crazygames: { es: 'Jugar en CrazyGames', en: 'Play on CrazyGames' },
-  trailer: { es: 'Ver tráiler', en: 'Watch trailer' },
-  presskit: { es: 'Kit de prensa', en: 'Press kit' },
-  web: { es: 'Web del juego', en: 'Game website' },
+  steam: { icono: 'steam', es: 'Ver en Steam', en: 'View on Steam' },
+  wishlist: { icono: 'steam', es: 'Añadir a deseados', en: 'Wishlist on Steam' },
+  itch: { icono: 'itchdotio', es: 'Jugar en itch.io', en: 'Play on itch.io' },
+  googleplay: { icono: 'googleplay', es: 'Google Play', en: 'Google Play' },
+  crazygames: { icono: 'mando', es: 'Jugar en CrazyGames', en: 'Play on CrazyGames' },
+  trailer: { icono: 'youtube', es: 'Ver tráiler', en: 'Watch trailer' },
+  presskit: { icono: 'web', es: 'Kit de prensa', en: 'Press kit' },
+  web: { icono: 'web', es: 'Web del juego', en: 'Game website' },
+};
+
+// Plataformas que se muestran en cada tarjeta, con su icono.
+export const plataformas = {
+  web: { icono: 'web', es: 'Navegador', en: 'Browser' },
+  windows: { icono: 'pc', es: 'Windows', en: 'Windows' },
+  android: { icono: 'android', es: 'Android', en: 'Android' },
+  pc: { icono: 'pc', es: 'PC', en: 'PC' },
 };
 
 // ----------------------------------------------------------------------------

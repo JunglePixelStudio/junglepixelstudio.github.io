@@ -2,11 +2,11 @@
 // Uso:  npm run construir   (o: node herramientas/construir.mjs)
 // No necesita dependencias: solo Node 18 o superior.
 
-import { readFile, writeFile, mkdir, rm, cp, access } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rm, cp, access, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { sitio, juegos, tiposEnlace, paginas, textos } from '../src/sitio.mjs';
+import { sitio, juegos, tiposEnlace, plataformas, paginas, textos } from '../src/sitio.mjs';
 import { svgPixel } from '../src/pixelfont.mjs';
 import { svgBosque, svgBordeBosque } from '../src/bosque.mjs';
 
@@ -24,6 +24,28 @@ const V = createHash('sha256')
   .update(await readFile(path.join(SRC, 'assets/js/early.js')))
   .digest('hex')
   .slice(0, 10);
+
+// --------------------------------------------------------------- iconos
+// Marcas: Simple Icons (CC0). Navegador, PC y mando: dibujados para esta web.
+const ICONOS = {};
+for (const archivo of (await readdir(path.join(SRC, 'iconos'))).filter((a) => a.endsWith('.svg'))) {
+  const svg = await readFile(path.join(SRC, 'iconos', archivo), 'utf8');
+  const viewBox = /viewBox="([^"]+)"/.exec(svg)?.[1] ?? '0 0 24 24';
+  const interior = svg
+    .replace(/^[\s\S]*?<svg[^>]*>/, '')
+    .replace(/<\/svg>\s*$/, '')
+    .replace(/<title>[\s\S]*?<\/title>/, '');
+  ICONOS[archivo.replace(/\.svg$/, '')] = { viewBox, interior };
+}
+const SPRITE = `<svg class="sprite" aria-hidden="true" focusable="false">${Object.entries(ICONOS)
+  .map(([id, i]) => `<symbol id="i-${id}" viewBox="${i.viewBox}">${i.interior}</symbol>`)
+  .join('')}</svg>`;
+
+function icono(id, clase = 'icon') {
+  if (!id) return '';
+  if (!ICONOS[id]) throw new Error(`Falta el icono src/iconos/${id}.svg`);
+  return `<svg class="${clase}" aria-hidden="true" focusable="false"><use href="#i-${id}"/></svg>`;
+}
 
 // ---------------------------------------------------------------- utilidades
 const esc = (s) =>
@@ -65,9 +87,12 @@ function correo(lang, desde, clase = '') {
   return `<a class="email js-email ${clase}" href="${href}" data-u="${esc(u)}" data-d="${esc(d)}">${esc(u)}<span class="email__at"> ${textos[lang].arroba} </span>${esc(d)}</a>`;
 }
 
-function enlacesRedes(clase) {
+function enlacesRedes(clase, soloIcono = false) {
   return sitio.redes
-    .map((r) => `<li><a class="${clase}" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer me">${esc(r.nombre)}<span class="sr-only"> (Jungle Pixel Studio)</span></a></li>`)
+    .map((r) => {
+      const nombre = soloIcono ? `<span class="sr-only">${esc(r.nombre)}</span>` : `<span>${esc(r.nombre)}</span>`;
+      return `<li><a class="${clase} red--${esc(r.icono)}" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer me"${soloIcono ? ` title="${esc(r.nombre)}"` : ''}>${icono(r.icono)}${nombre}<span class="sr-only"> (Jungle Pixel Studio)</span></a></li>`;
+    })
     .join('');
 }
 
@@ -80,7 +105,7 @@ function redes(lang) {
 /** Lista sencilla para el pie. */
 function redesPie(lang) {
   if (!sitio.redes.length) return '';
-  return `<p class="eyebrow footer__social-title">${lang === 'es' ? 'Síguenos' : 'Follow us'}</p><ul class="footer__social">${enlacesRedes('')}</ul>`;
+  return `<p class="eyebrow footer__social-title">${lang === 'es' ? 'Síguenos' : 'Follow us'}</p><ul class="footer__social">${enlacesRedes('footer__social-link', true)}</ul>`;
 }
 
 function titular(lang) {
@@ -111,7 +136,9 @@ function tarjetaJuego(j, lang, desde) {
   const t = (o) => (typeof o === 'string' ? o : o[lang]);
   const etiquetas =
     (j.etiquetas?.[lang] ?? []).map((e) => `<li class="chip">${esc(e)}</li>`).join('') +
-    (j.plataformas ? `<li class="chip chip--plat">${esc(j.plataformas)}</li>` : '');
+    (j.plataformas ?? [])
+      .map((p) => `<li class="chip chip--plat">${icono(plataformas[p]?.icono)}${esc(plataformas[p]?.[lang] ?? p)}</li>`)
+      .join('');
   let portada;
   if (j.secreto) {
     portada = `<div class="secret" aria-hidden="true">${svgBosque(undefined, 'mini-forest')}${svgPixel(['?'], { clase: 'pixel secret__glyph' })}<span class="secret__label">${lang === 'es' ? 'Sin anunciar' : 'Unannounced'}</span></div>`;
@@ -121,7 +148,7 @@ function tarjetaJuego(j, lang, desde) {
   const enlaces = (j.enlaces ?? [])
     .map(
       (e, i) =>
-        `<a class="btn btn--small ${i === 0 ? 'btn--primary' : 'btn--ghost'}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer"><span>${esc(tiposEnlace[e.tipo]?.[lang] ?? e.texto?.[lang] ?? e.url)}</span><span class="sr-only"> — ${esc(t(j.titulo))}</span><span class="btn__arrow" aria-hidden="true">↗</span></a>`
+        `<a class="btn btn--small ${i === 0 ? 'btn--primary' : 'btn--ghost'}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">${icono(tiposEnlace[e.tipo]?.icono)}<span>${esc(tiposEnlace[e.tipo]?.[lang] ?? e.texto?.[lang] ?? e.url)}</span><span class="sr-only"> — ${esc(t(j.titulo))}</span><span class="btn__arrow" aria-hidden="true">↗</span></a>`
     )
     .join('');
   const pie = enlaces
@@ -261,6 +288,7 @@ function documento(p, lang, main, extraHead = '') {
 <html lang="${lang}" class="no-js">
 ${head(p, lang, extraHead)}
 <body class="${clase}" id="top">
+${SPRITE}
 ${cabecera(p, lang)}
 ${main}
 ${pie(p, lang)}
@@ -365,6 +393,7 @@ function pagina404() {
 <script type="module" src="/assets/js/main.js?v=${V}"></script>
 </head>
 <body class="page-404" id="top">
+${SPRITE}
 <main id="contenido" class="not-found">
   <div class="container not-found__inner">
     <a class="brand" href="/" aria-label="Jungle Pixel Studio">${marca('/')}</a>
