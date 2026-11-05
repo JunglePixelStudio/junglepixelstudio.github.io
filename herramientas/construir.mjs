@@ -3,6 +3,7 @@
 // No necesita dependencias: solo Node 18 o superior.
 
 import { readFile, writeFile, mkdir, rm, cp, access } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sitio, juegos, tiposEnlace, paginas, textos } from '../src/sitio.mjs';
@@ -14,6 +15,15 @@ const SRC = path.join(RAIZ, 'src');
 const IDIOMAS = ['es', 'en'];
 
 const OUT = path.join(RAIZ, 'docs');
+
+// Versión de los estilos y scripts: cambia cuando cambian, así los navegadores
+// nunca mezclan una página nueva con un archivo viejo guardado en caché.
+const V = createHash('sha256')
+  .update(await readFile(path.join(SRC, 'assets/css/main.css')))
+  .update(await readFile(path.join(SRC, 'assets/js/main.js')))
+  .update(await readFile(path.join(SRC, 'assets/js/early.js')))
+  .digest('hex')
+  .slice(0, 10);
 
 // ---------------------------------------------------------------- utilidades
 const esc = (s) =>
@@ -239,9 +249,9 @@ function head(p, lang, extra = '') {
 <link rel="apple-touch-icon" href="${r}apple-touch-icon.png">
 <link rel="preload" href="${r}assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${r}assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="${r}assets/css/main.css">
-<script src="${r}assets/js/early.js"></script>
-<script type="module" src="${r}assets/js/main.js"></script>
+<link rel="stylesheet" href="${r}assets/css/main.css?v=${V}">
+<script src="${r}assets/js/early.js?v=${V}"></script>
+<script type="module" src="${r}assets/js/main.js?v=${V}"></script>
 ${extra}</head>`;
 }
 
@@ -350,9 +360,9 @@ function pagina404() {
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/main.css">
-<script src="/assets/js/early.js"></script>
-<script type="module" src="/assets/js/main.js"></script>
+<link rel="stylesheet" href="/assets/css/main.css?v=${V}">
+<script src="/assets/js/early.js?v=${V}"></script>
+<script type="module" src="/assets/js/main.js?v=${V}"></script>
 </head>
 <body class="page-404" id="top">
 <main id="contenido" class="not-found">
