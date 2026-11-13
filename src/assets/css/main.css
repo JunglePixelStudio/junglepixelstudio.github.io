@@ -731,28 +731,51 @@ h3 {
   line-height: 0.95;
 }
 
-/* -------------------------------------------------------------- nubes */
-.clouds {
+/* -------------------------------------------------------------- lianas */
+.vines {
   position: absolute;
-  inset: 0;
+  inset: 0 0 auto;
   z-index: 1;
+  height: 100%;
   pointer-events: none;
   overflow: hidden;
 }
 
-.cloud {
+.vine {
   position: absolute;
-  width: clamp(110px, 14vw, 200px);
-  height: auto;
-  fill: #fffdf6;
-  filter: drop-shadow(3px 0 0 var(--ink)) drop-shadow(-3px 0 0 var(--ink)) drop-shadow(0 3px 0 var(--ink)) drop-shadow(0 -3px 0 var(--ink)) drop-shadow(0 6px 0 var(--ink));
+  top: -8px;
+  display: block;
+  transform-origin: 50% 0;
   will-change: transform;
 }
 
-.cloud--1 { top: 14%; left: 4%; }
-.cloud--2 { top: 22%; right: 6%; width: clamp(80px, 9vw, 140px); }
-.cloud--3 { bottom: 22%; left: 12%; width: clamp(70px, 8vw, 120px); }
-.cloud--4 { bottom: 16%; right: 14%; }
+.vine__svg {
+  width: auto;
+  height: auto;
+  max-width: none;
+  transform-origin: 50% 0;
+  animation: mecer 5.5s ease-in-out infinite alternate;
+  filter: drop-shadow(2px 0 0 var(--ink)) drop-shadow(-2px 0 0 var(--ink)) drop-shadow(0 2px 0 var(--ink));
+}
+
+.vine__stem { fill: #3f7a3a; }
+.vine__leaf-a { fill: #8fcf4a; }
+.vine__leaf-b { fill: #4f9a3c; }
+
+.vine--1 { left: 3%; }
+.vine--2 { left: 13%; }
+.vine--2 .vine__svg { animation-duration: 6.5s; animation-delay: -2s; }
+.vine--3 { right: 4%; }
+.vine--3 .vine__svg { animation-duration: 7s; animation-delay: -1s; }
+.vine--4 { right: 15%; }
+.vine--4 .vine__svg { animation-duration: 5s; animation-delay: -3s; }
+.vine--5 { left: 47%; }
+.vine--5 .vine__svg { animation-duration: 6s; animation-delay: -4s; }
+
+@keyframes mecer {
+  from { transform: rotate(-3deg); }
+  to { transform: rotate(3deg); }
+}
 
 /* ---------------------------------------------------------------- portada */
 .page-hero {
@@ -2126,52 +2149,58 @@ h3 {
   cursor: none !important;
 }
 
-.cursor,
-.cursor-ring {
+.cursor-leaf {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 250;
+  width: 30px;
+  height: 30px;
   pointer-events: none;
   opacity: 0;
-  border-radius: 50%;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.25s ease;
 }
 
-.cursor {
-  width: 9px;
-  height: 9px;
-  margin: -4.5px 0 0 -4.5px;
-  background: var(--orange);
-  box-shadow: 0 0 0 2px var(--ink);
-}
-
-.cursor-ring {
-  --s: 38px;
-  width: var(--s);
-  height: var(--s);
-  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
-  border: 3px solid var(--ink);
-  transition:
-    opacity 0.3s ease,
-    width 0.4s var(--bounce),
-    height 0.4s var(--bounce),
-    margin 0.4s var(--bounce),
-    background-color 0.3s ease;
-}
-
-.cursor.is-visible,
-.cursor-ring.is-visible {
+.cursor-leaf.is-visible {
   opacity: 1;
 }
 
-.cursor-ring.is-hover {
-  --s: 60px;
-  background: rgba(168, 219, 78, 0.35);
+.cursor-leaf svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 2px 2px;
+  transition:
+    transform 0.35s var(--bounce),
+    filter 0.25s ease;
+  filter: drop-shadow(1.5px 0 0 var(--ink)) drop-shadow(-1.5px 0 0 var(--ink)) drop-shadow(0 1.5px 0 var(--ink)) drop-shadow(0 -1.5px 0 var(--ink));
 }
 
-.cursor-ring.is-down {
-  --s: 28px;
+.cursor-leaf .a { fill: #9ad94e; }
+.cursor-leaf .b { fill: #4f9a3c; }
+.cursor-leaf .c { fill: #2f5240; }
+
+.cursor-leaf.is-hover svg {
+  transform: scale(1.35) rotate(-12deg);
+}
+
+.cursor-leaf.is-hover .a { fill: var(--sun); }
+.cursor-leaf.is-hover .b { fill: var(--orange); }
+
+.cursor-leaf.is-down svg {
+  transform: scale(0.85) rotate(10deg);
+}
+
+.cursor-bit {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 249;
+  width: 6px;
+  height: 6px;
+  pointer-events: none;
+  background: #8fcf4a;
+  box-shadow: 0 0 0 1.5px var(--ink);
 }
 
 .spotlight {
@@ -2361,8 +2390,10 @@ h3 {
     gap: 0.2rem;
   }
 
-  .cloud {
-    width: 90px;
+  .vine--2,
+  .vine--4,
+  .vine--5 {
+    display: none;
   }
 }
 
@@ -2397,8 +2428,7 @@ h3 {
   .progress,
   .legal__aside,
   .skip,
-  .cursor,
-  .cursor-ring,
+  .cursor-leaf,
   .lightbox {
     display: none !important;
   }

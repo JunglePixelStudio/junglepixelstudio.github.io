@@ -133,3 +133,58 @@ export function svgNubes(n = 4) {
   }
   return `<div class="clouds" aria-hidden="true">${html}</div>`;
 }
+
+// ------------------------------------------------------------ lianas
+// Hojas de pixeles para colgar de la liana (a = clara, b = oscura)
+const HOJA_IZQ = ['..aaa', '.aaab', 'aaab.', '.bb..'];
+const HOJA_DER = ['aaa..', 'baaa.', '.baaa', '..bb.'];
+
+function rectsBitmap(filas, ox, oy, t) {
+  const out = { a: '', b: '' };
+  filas.forEach((fila, y) =>
+    [...fila].forEach((c, x) => {
+      if (c === 'a' || c === 'b') out[c] += `M${ox + x * t} ${oy + y * t}h${t}v${t}h${-t}z`;
+    })
+  );
+  return out;
+}
+
+/** Una liana que cuelga desde arriba: tallo escalonado y hojas alternas. */
+function liana(alto, semilla) {
+  const t = 6;
+  const filas = Math.round(alto / t);
+  const ancho = 16; // columnas
+  let tallo = '';
+  let a = '';
+  let b = '';
+  let lado = semilla % 2;
+  for (let y = 0; y < filas; y++) {
+    const x = Math.round(7 + Math.sin(y * 0.22 + semilla) * 2.2);
+    tallo += `M${x * t} ${y * t}h${t * 2}v${t}h${-t * 2}z`;
+    if (y > 3 && (y + semilla) % 6 === 0) {
+      const hoja = lado ? HOJA_DER : HOJA_IZQ;
+      const ox = lado ? (x + 2) * t : (x - 5) * t;
+      const r = rectsBitmap(hoja, ox, (y - 1) * t, t);
+      a += r.a;
+      b += r.b;
+      lado = 1 - lado;
+    }
+  }
+  // Hoja grande al final de la liana
+  const xf = Math.round(7 + Math.sin(filas * 0.22 + semilla) * 2.2);
+  const fin = rectsBitmap(['.aaa.', 'aaaab', 'aaabb', '.abb.', '..b..'], (xf - 1.5) * t, filas * t, t);
+  a += fin.a;
+  b += fin.b;
+  const h = (filas + 5) * t;
+  return { svg: `<svg class="vine__svg" viewBox="0 0 ${ancho * t} ${h}" width="${ancho * t}" height="${h}" focusable="false"><path class="vine__stem" d="${tallo}"/><path class="vine__leaf-b" d="${b}"/><path class="vine__leaf-a" d="${a}"/></svg>` };
+}
+
+/** Varias lianas colgando del borde superior de una sección (.vine--1 … .vine--n). */
+export function svgLianas(n = 5) {
+  const altos = [230, 150, 300, 120, 200, 170];
+  let html = '';
+  for (let i = 0; i < n; i++) {
+    html += `<span class="vine vine--${i + 1}" data-vine>${liana(altos[i % altos.length], i * 3 + 1).svg}</span>`;
+  }
+  return `<div class="vines" aria-hidden="true">${html}</div>`;
+}

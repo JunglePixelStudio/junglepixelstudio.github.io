@@ -547,24 +547,30 @@ function initLogoTilt() {
   });
 }
 
-// ------------------------------------------------- nubes que flotan
-function initClouds() {
+// ------------------------------------------------- lianas que se apartan
+function initVines() {
   if (reduce) return;
-  $$('.clouds').forEach((caja) => {
+  $$('.vines').forEach((caja) => {
     let visible = false;
     new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(caja);
-    const nubes = $$('.cloud', caja).map((el, i) => ({ el, d: +el.dataset.depth || 0.5, x: 0, y: 0, f: i * 1.7 }));
-    updaters.push((dt, now) => {
+    const lianas = $$('[data-vine]', caja).map((el) => ({ el, ang: 0, vel: 0 }));
+    updaters.push((dt) => {
       if (!visible) return;
-      const r = caja.getBoundingClientRect();
-      const prog = (window.innerHeight - r.top) / (window.innerHeight + r.height);
-      const nx = pointer.seen ? clamp(pointer.x / window.innerWidth - 0.5, -0.5, 0.5) : 0;
-      for (const n of nubes) {
-        const tx = nx * 50 * n.d + Math.sin(now / 2600 + n.f) * 14;
-        const ty = (prog - 0.5) * -90 * n.d;
-        n.x = lerp(n.x, tx, 0.05);
-        n.y = lerp(n.y, ty, 0.1);
-        n.el.style.transform = `translate3d(${n.x.toFixed(1)}px, ${n.y.toFixed(1)}px, 0)`;
+      for (const l of lianas) {
+        const b = l.el.getBoundingClientRect();
+        let empuje = 0;
+        if (pointer.inside && pointer.y > b.top && pointer.y < b.bottom + 30) {
+          const dx = pointer.x - (b.left + b.width / 2);
+          if (Math.abs(dx) < 110) {
+            // la liana se aparta del ratón y recoge su "viento"
+            empuje = -Math.sign(dx || 1) * (1 - Math.abs(dx) / 110) * 14 + clamp(pointer.vx, -30, 30) * 0.25;
+          }
+        }
+        l.vel = (l.vel + (empuje - l.ang) * 0.06 * dt) * Math.pow(0.9, dt);
+        l.ang += l.vel * dt;
+        if (Math.abs(l.ang) > 0.02 || Math.abs(l.vel) > 0.02) {
+          l.el.style.transform = `rotate(${l.ang.toFixed(2)}deg)`;
+        }
       }
     });
   });
@@ -724,42 +730,73 @@ function initMagnetic() {
   });
 }
 
-// --------------------------------------------------- cursor y luz de sol
+// --------------------------------------------------- cursor: una hoja
+const HOJA_CURSOR = ['...aaaa', '..aaaab', '.aaa.bb', '.aa.bbb', '.a.bbb.', '.cbbb..', 'c......'];
+
+function svgHojaCursor() {
+  // La punta de la hoja (arriba a la derecha) se gira para quedar arriba a la izquierda, como una flecha
+  let rects = '';
+  HOJA_CURSOR.forEach((fila, y) =>
+    [...fila].forEach((c, x) => {
+      if (c !== '.') rects += `<rect class="${c}" x="${6 - x}" y="${y}" width="1.02" height="1.02"/>`;
+    })
+  );
+  return `<svg viewBox="0 0 7 7" aria-hidden="true" focusable="false" shape-rendering="crispEdges">${rects}</svg>`;
+}
+
 function initCursor() {
   if (!finePointer || reduce) return;
-  const dot = document.createElement('div');
-  const ring = document.createElement('div');
-  const spot = document.createElement('div');
-  dot.className = 'cursor';
-  ring.className = 'cursor-ring';
-  spot.className = 'spotlight';
-  [dot, ring, spot].forEach((n) => n.setAttribute('aria-hidden', 'true'));
-  document.body.append(spot, ring, dot);
+  const hoja = document.createElement('div');
+  hoja.className = 'cursor-leaf';
+  hoja.setAttribute('aria-hidden', 'true');
+  hoja.innerHTML = svgHojaCursor();
+  document.body.append(hoja);
   html.classList.add('has-cursor');
+  const svg = hoja.firstElementChild;
 
-  let rx = pointer.x;
-  let ry = pointer.y;
-  let sx = pointer.x;
-  let sy = pointer.y;
-
-  window.addEventListener('pointerdown', () => ring.classList.add('is-down'));
-  window.addEventListener('pointerup', () => ring.classList.remove('is-down'));
+  window.addEventListener('pointerdown', () => hoja.classList.add('is-down'));
+  window.addEventListener('pointerup', () => hoja.classList.remove('is-down'));
   document.addEventListener('pointerover', (e) => {
-    const hit = e.target.closest('a, button, summary, [data-tilt], [data-copy-email], [data-logo-tilt]');
-    ring.classList.toggle('is-hover', !!hit);
+    const hit = e.target.closest('a, button, summary, [data-tilt], [data-copy-email], [data-logo-tilt], [data-full]');
+    hoja.classList.toggle('is-hover', !!hit);
   });
-  document.addEventListener('pointerleave', () => [dot, ring, spot].forEach((n) => n.classList.remove('is-visible')));
+  document.addEventListener('pointerleave', () => hoja.classList.remove('is-visible'));
 
-  const update = (dt) => {
+  // Pedacitos de hoja que caen cuando mueves el ratón deprisa
+  const trozos = [];
+  let ultimo = 0;
+  let giro = 0;
+  const update = (dt, now) => {
     if (!pointer.seen) return;
-    if (!dot.classList.contains('is-visible') && pointer.inside) [dot, ring, spot].forEach((n) => n.classList.add('is-visible'));
-    rx = lerp(rx, pointer.x, 1 - Math.pow(0.8, dt));
-    ry = lerp(ry, pointer.y, 1 - Math.pow(0.8, dt));
-    sx = lerp(sx, pointer.x, 1 - Math.pow(0.93, dt));
-    sy = lerp(sy, pointer.y, 1 - Math.pow(0.93, dt));
-    dot.style.transform = `translate3d(${pointer.x}px, ${pointer.y}px, 0)`;
-    ring.style.transform = `translate3d(${rx.toFixed(1)}px, ${ry.toFixed(1)}px, 0)`;
-    spot.style.transform = `translate3d(${sx.toFixed(1)}px, ${sy.toFixed(1)}px, 0)`;
+    if (!hoja.classList.contains('is-visible') && pointer.inside) hoja.classList.add('is-visible');
+    hoja.style.transform = `translate3d(${pointer.x}px, ${pointer.y}px, 0)`;
+    giro = lerp(giro, clamp(pointer.vx * 1.2, -25, 25), 0.2);
+    if (!hoja.classList.contains('is-hover') && !hoja.classList.contains('is-down')) svg.style.transform = `rotate(${giro.toFixed(1)}deg)`;
+    else svg.style.transform = '';
+    const rapidez = Math.hypot(pointer.vx, pointer.vy);
+    if (rapidez > 9 && now - ultimo > 45 && trozos.length < 24) {
+      ultimo = now;
+      const el = document.createElement('div');
+      el.className = 'cursor-bit';
+      el.setAttribute('aria-hidden', 'true');
+      document.body.append(el);
+      trozos.push({ el, x: pointer.x + 8, y: pointer.y + 10, vx: (Math.random() - 0.5) * 1.5, vy: 0.5 + Math.random(), vida: 1, r: Math.random() * 90 });
+    }
+    for (let i = trozos.length - 1; i >= 0; i--) {
+      const t = trozos[i];
+      t.vy += 0.08 * dt;
+      t.x += (t.vx + Math.sin(now / 200 + t.r) * 0.6) * dt;
+      t.y += t.vy * dt;
+      t.vida -= 0.02 * dt;
+      t.r += 4 * dt;
+      if (t.vida <= 0) {
+        t.el.remove();
+        trozos.splice(i, 1);
+        continue;
+      }
+      t.el.style.opacity = t.vida.toFixed(2);
+      t.el.style.transform = `translate3d(${t.x.toFixed(1)}px, ${t.y.toFixed(1)}px, 0) rotate(${t.r.toFixed(0)}deg)`;
+    }
   };
   update.isCursor = true;
   updaters.push(update);
@@ -835,7 +872,7 @@ function initLoop() {
 }
 
 // ------------------------------------------------------------------ inicio
-const inits = [initEmail, initYear, initHeader, initMenu, initActiveNav, initReveal, initPixelTitles, initForest, initLogoTilt, initClouds, initLightbox, initWords, initTrail, initTilt, initMagnetic, initCursor, initToc];
+const inits = [initEmail, initYear, initHeader, initMenu, initActiveNav, initReveal, initPixelTitles, initForest, initLogoTilt, initVines, initLightbox, initWords, initTrail, initTilt, initMagnetic, initCursor, initToc];
 for (const init of inits) {
   try {
     init();

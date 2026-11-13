@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sitio, juegos, tiposEnlace, plataformas, paginas, textos } from '../src/sitio.mjs';
 import { svgPixel } from '../src/pixelfont.mjs';
-import { svgBosque, svgBorde, svgNubes } from '../src/bosque.mjs';
+import { svgBosque, svgBorde, svgLianas } from '../src/bosque.mjs';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(RAIZ, 'src');
@@ -423,7 +423,7 @@ function reemplazar(html, lang, ruta) {
     .replace(/\{\{destacado-fondo\}\}/g, () => `${prefijo(ruta)}assets/img/capturas/portada-${destacado.id}.webp`)
     .replace(/\{\{fondo:([a-z0-9-]+)\}\}/g, (_, f) => `<img class="page-hero__bg" src="${prefijo(ruta)}assets/img/capturas/${f}.webp" alt="" width="1920" height="1080" fetchpriority="high" decoding="async" data-parallax-bg>`)
     .replace(/\{\{borde:([a-z-]+)\}\}/g, (_, c) => svgBorde(c.length, `edge edge--${c}`))
-    .replace(/\{\{nubes\}\}/g, () => svgNubes(4))
+    .replace(/\{\{nubes\}\}/g, () => svgLianas(4))
     .replace(/\{\{ico:([a-z]+)\}\}/g, (_, id) => icono(id))
     .replace(/\{\{bosque\}\}/g, () => svgBosque())
     .replace(/\{\{icono:([^}]+)\}\}/g, (_, ch) => svgPixel([ch], { clase: 'pixel-icon', hueco: 0, nitido: true }))
@@ -506,7 +506,7 @@ function pagina404() {
 <body class="page-404" id="top">
 ${SPRITE}
 <main id="contenido" class="not-found band band--sky">
-  ${svgNubes(4)}
+  ${svgLianas(4)}
   <div class="container not-found__inner">
     <a class="brand" href="/" aria-label="Jungle Pixel Studio">${marca('/')}</a>
     <h1 class="not-found__title"><span class="sr-only">404</span>${svgPixel(['404'], { clase: 'pixel pixel--title pixel--404' })}</h1>
