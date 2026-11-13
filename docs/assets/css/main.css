@@ -2395,6 +2395,19 @@ h3 {
   .vine--5 {
     display: none;
   }
+
+  .vine {
+    scale: 0.5;
+    transform-origin: 50% 0;
+  }
+
+  .vine--1 {
+    left: -14px;
+  }
+
+  .vine--3 {
+    right: -14px;
+  }
 }
 
 /* ------------------------------------------------- movimiento reducido */
