@@ -26,3 +26,4 @@ src/demo/
 
 # Originales de las portadas (pesados; las versiones web van en src/assets/img/juegos)
 src/marca/portadas/
+src/marca/capturas/

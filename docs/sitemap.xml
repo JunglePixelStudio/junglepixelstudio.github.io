@@ -13,6 +13,78 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/"/>
   </url>
   <url>
+    <loc>https://junglepixelstudio.github.io/juegos.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/juegos.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/games.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/en/games.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/juegos.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/games.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/estudio.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/estudio.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/studio.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/en/studio.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/estudio.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/studio.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/noticias.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/noticias.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/news.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/en/news.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/noticias.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/news.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/empleo.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/empleo.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/careers.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/en/careers.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/empleo.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/careers.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/prensa.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/prensa.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/press.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/en/press.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/prensa.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/press.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/contacto.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/contacto.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/contact.html"/>
+  </url>
+  <url>
+    <loc>https://junglepixelstudio.github.io/en/contact.html</loc>
+    <lastmod>2026-11-04</lastmod>
+    <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/contacto.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://junglepixelstudio.github.io/en/contact.html"/>
+  </url>
+  <url>
     <loc>https://junglepixelstudio.github.io/legal/aviso-legal.html</loc>
     <lastmod>2026-11-04</lastmod>
     <xhtml:link rel="alternate" hreflang="es" href="https://junglepixelstudio.github.io/legal/aviso-legal.html"/>

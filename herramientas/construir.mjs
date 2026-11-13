@@ -8,12 +8,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sitio, juegos, tiposEnlace, plataformas, paginas, textos } from '../src/sitio.mjs';
 import { svgPixel } from '../src/pixelfont.mjs';
-import { svgBosque, svgBordeBosque } from '../src/bosque.mjs';
+import { svgBosque, svgBorde, svgNubes } from '../src/bosque.mjs';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(RAIZ, 'src');
 const IDIOMAS = ['es', 'en'];
-
 const OUT = path.join(RAIZ, 'docs');
 
 // Versión de los estilos y scripts: cambia cuando cambian, así los navegadores
@@ -47,6 +46,14 @@ function icono(id, clase = 'icon') {
   return `<svg class="${clase}" aria-hidden="true" focusable="false"><use href="#i-${id}"/></svg>`;
 }
 
+// Capturas de la galería (src/assets/img/capturas/<juego>-<n>.webp)
+const CAPTURAS = (await readdir(path.join(SRC, 'assets/img/capturas')))
+  .filter((f) => f.endsWith('.webp') && !f.startsWith('portada-'))
+  .map((f) => {
+    const m = /^(.+)-(\d+)\.webp$/.exec(f);
+    return { archivo: f, juego: m[1], n: +m[2] };
+  });
+
 // ---------------------------------------------------------------- utilidades
 const esc = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -66,6 +73,8 @@ function enlace(desde, hacia, ancla = '') {
 const absoluta = (ruta) => `${sitio.url}/${sinIndex(ruta)}`;
 const pagina = (id) => paginas.find((p) => p.id === id);
 const legales = paginas.filter((p) => p.tipo === 'legal');
+const red = (icono) => sitio.redes.find((r) => r.icono === icono);
+const tx = (o, lang) => (typeof o === 'string' ? o : o?.[lang] ?? '');
 
 const CSP = [
   "default-src 'none'",
@@ -83,7 +92,7 @@ const CSP = [
 // ------------------------------------------------------------- piezas comunes
 function correo(lang, desde, clase = '') {
   const [u, d] = sitio.correo.split('@');
-  const href = enlace(desde, pagina('inicio')[lang].ruta, '#contacto');
+  const href = enlace(desde, pagina('contacto')[lang].ruta);
   return `<a class="email js-email ${clase}" href="${href}" data-u="${esc(u)}" data-d="${esc(d)}">${esc(u)}<span class="email__at"> ${textos[lang].arroba} </span>${esc(d)}</a>`;
 }
 
@@ -96,16 +105,20 @@ function enlacesRedes(clase, soloIcono = false) {
     .join('');
 }
 
-/** Bloque "Síguenos" con botones (contacto). */
-function redes(lang) {
-  if (!sitio.redes.length) return '';
-  return `<div class="social"><p class="social__title">${lang === 'es' ? 'Síguenos' : 'Follow us'}</p><ul class="social__list">${enlacesRedes('social__link')}</ul></div>`;
-}
+const VERBO_RED = {
+  itchdotio: { es: 'Juega en', en: 'Play on' },
+  youtube: { es: 'Suscríbete en', en: 'Subscribe on' },
+  default: { es: 'Síguenos en', en: 'Follow us on' },
+};
 
-/** Lista sencilla para el pie. */
-function redesPie(lang) {
-  if (!sitio.redes.length) return '';
-  return `<p class="eyebrow footer__social-title">${lang === 'es' ? 'Síguenos' : 'Follow us'}</p><ul class="footer__social">${enlacesRedes('footer__social-link', true)}</ul>`;
+/** Tarjetas grandes de canales (Noticias, Contacto). */
+function canales(lang) {
+  return `<ul class="channels">${sitio.redes
+    .map((r) => {
+      const verbo = (VERBO_RED[r.icono] ?? VERBO_RED.default)[lang];
+      return `<li data-reveal><a class="channel red--${esc(r.icono)}" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer me" data-tilt><span class="channel__icon">${icono(r.icono)}</span><span class="channel__text">${verbo} <strong>${esc(r.nombre)}</strong></span></a></li>`;
+    })
+    .join('')}</ul>`;
 }
 
 function titular(lang) {
@@ -132,39 +145,109 @@ function bloqueTitular(lang, desde) {
   return `<dl class="data-list">${filas.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
 }
 
-function tarjetaJuego(j, lang, desde) {
-  const t = (o) => (typeof o === 'string' ? o : o[lang]);
-  const etiquetas =
-    (j.etiquetas?.[lang] ?? []).map((e) => `<li class="chip">${esc(e)}</li>`).join('') +
-    (j.plataformas ?? [])
-      .map((p) => `<li class="chip chip--plat">${icono(plataformas[p]?.icono)}${esc(plataformas[p]?.[lang] ?? p)}</li>`)
-      .join('');
-  let portada;
-  if (j.secreto) {
-    portada = `<div class="secret" aria-hidden="true">${svgBosque(undefined, 'mini-forest')}${svgPixel(['?'], { clase: 'pixel secret__glyph' })}<span class="secret__label">${lang === 'es' ? 'Sin anunciar' : 'Unannounced'}</span></div>`;
-  } else {
-    portada = `<img src="${prefijo(desde)}${esc(j.imagen)}" alt="${esc(t(j.imagenAlt ?? j.titulo))}" width="756" height="600" loading="lazy" decoding="async">`;
-  }
-  const enlaces = (j.enlaces ?? [])
+// ------------------------------------------------------------------ juegos
+function botonesJuego(j, lang, clase = 'btn--small') {
+  return (j.enlaces ?? [])
     .map(
       (e, i) =>
-        `<a class="btn btn--small ${i === 0 ? 'btn--primary' : 'btn--ghost'}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">${icono(tiposEnlace[e.tipo]?.icono)}<span>${esc(tiposEnlace[e.tipo]?.[lang] ?? e.texto?.[lang] ?? e.url)}</span><span class="sr-only"> — ${esc(t(j.titulo))}</span><span class="btn__arrow" aria-hidden="true">↗</span></a>`
+        `<a class="btn ${clase} ${i === 0 ? 'btn--primary' : 'btn--light'}" href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">${icono(tiposEnlace[e.tipo]?.icono)}<span>${esc(tiposEnlace[e.tipo]?.[lang] ?? e.texto?.[lang] ?? e.url)}</span><span class="sr-only"> — ${esc(tx(j.titulo, lang))}</span></a>`
     )
     .join('');
-  const pie = enlaces
-    ? `<div class="game-card__links">${enlaces}</div>`
-    : `<p class="game-card__soon"><span class="dot" aria-hidden="true"></span>${lang === 'es' ? 'Anuncio muy pronto' : 'Announcement coming soon'}</p>`;
-  const ancha = juegos.length === 1 ? ' game-card--wide' : '';
-  return `<article class="game-card${ancha}" data-tilt data-reveal>
-  <div class="game-card__cover">${portada}<span class="game-card__glare" aria-hidden="true"></span></div>
+}
+
+function chipsJuego(j, lang) {
+  return (
+    (j.plataformas ?? [])
+      .map((p) => `<li class="chip chip--plat">${icono(plataformas[p]?.icono)}${esc(plataformas[p]?.[lang] ?? p)}</li>`)
+      .join('') + (j.etiquetas?.[lang] ?? []).map((e) => `<li class="chip">${esc(e)}</li>`).join('')
+  );
+}
+
+function portadaJuego(j, lang, desde) {
+  if (j.secreto) {
+    return `<div class="secret" aria-hidden="true">${svgBosque(undefined, 'mini-forest')}${svgPixel(['?'], { clase: 'pixel secret__glyph' })}<span class="secret__label">${lang === 'es' ? 'Sin anunciar' : 'Unannounced'}</span></div>`;
+  }
+  return `<img src="${prefijo(desde)}${esc(j.imagen)}" alt="${esc(tx(j.imagenAlt ?? j.titulo, lang))}" width="756" height="600" loading="lazy" decoding="async">`;
+}
+
+/** Título en dos tonos: la última palabra va en verde lima. */
+function dosTonos(titulo) {
+  const partes = titulo.trim().split(/\s+/);
+  if (partes.length < 2) return `<span class="hl">${esc(titulo)}</span>`;
+  const ultima = partes.pop();
+  return `${esc(partes.join(' '))} <span class="hl">${esc(ultima)}</span>`;
+}
+
+function tarjetaJuego(j, lang, desde) {
+  const botones = botonesJuego(j, lang);
+  const pie = botones
+    ? `<div class="game-card__links">${botones}</div>`
+    : `<p class="game-card__soon">${lang === 'es' ? 'Anuncio muy pronto' : 'Announcement coming soon'}</p>`;
+  return `<article class="game-card sticker" data-tilt data-reveal>
+  <div class="game-card__cover">${portadaJuego(j, lang, desde)}<span class="game-card__glare" aria-hidden="true"></span><span class="pill pill--float">${esc(tx(j.estado, lang))}</span></div>
   <div class="game-card__body">
-    <p class="game-card__status"><span class="dot dot--live" aria-hidden="true"></span>${esc(t(j.estado))}</p>
-    <h3 class="game-card__title">${esc(t(j.titulo))}</h3>
-    <p class="game-card__text">${esc(t(j.descripcion))}</p>
-    ${etiquetas ? `<ul class="chips">${etiquetas}</ul>` : ''}
+    <h3 class="game-card__title">${esc(tx(j.titulo, lang))}</h3>
+    <p class="game-card__text">${esc(tx(j.descripcion, lang))}</p>
+    <ul class="chips">${chipsJuego(j, lang)}</ul>
     ${pie}
   </div>
 </article>`;
+}
+
+function fichaJuego(j, i, lang, desde) {
+  const botones = botonesJuego(j, lang, '');
+  return `<article class="feature${i % 2 ? ' feature--rev' : ''}" id="${esc(j.id)}">
+  <div class="feature__text" data-reveal>
+    <p class="pill">${esc(tx(j.estado, lang))}</p>
+    <h2 class="feature__title t-outline">${dosTonos(tx(j.titulo, lang))}</h2>
+    <p class="feature__desc">${esc(tx(j.descripcion, lang))}</p>
+    <ul class="chips chips--center">${chipsJuego(j, lang)}</ul>
+    ${botones ? `<div class="feature__links">${botones}</div>` : `<p class="feature__soon">${lang === 'es' ? 'Anuncio muy pronto' : 'Announcement coming soon'}</p>`}
+  </div>
+  <figure class="feature__media" data-reveal>
+    <div class="frame" data-tilt>${portadaJuego(j, lang, desde)}<span class="game-card__glare" aria-hidden="true"></span></div>
+    <figcaption>${j.secreto ? (lang === 'es' ? 'Próximamente' : 'Coming soon') : lang === 'es' ? 'Portada' : 'Cover art'}</figcaption>
+  </figure>
+</article>`;
+}
+
+/** Galería de capturas con visor (lightbox). */
+function galeria(lang, desde, max = 99) {
+  const lista = CAPTURAS.slice(0, max);
+  return `<div class="gallery" data-gallery>${lista
+    .map((c, i) => {
+      const j = juegos.find((x) => x.id === c.juego);
+      const alt = `${tx(j?.titulo ?? c.juego, lang)} — ${lang === 'es' ? 'captura' : 'screenshot'} ${c.n}`;
+      const src = `${prefijo(desde)}assets/img/capturas/${c.archivo}`;
+      return `<button class="gallery__item${i === 0 ? ' gallery__item--big' : ''}" type="button" data-full="${src}" data-alt="${esc(alt)}" data-reveal><img src="${src}" alt="${esc(alt)}" width="960" height="540" loading="lazy" decoding="async"></button>`;
+    })
+    .join('')}</div>`;
+}
+
+/** Ficha de prensa en tarjetas de colores. */
+function fichas(lang, desde) {
+  const publicados = juegos.filter((j) => !j.secreto).length;
+  const filas =
+    lang === 'es'
+      ? [
+          ['Estudio', 'Jungle Pixel Studio'],
+          ['Origen', 'Colombia · Venezuela'],
+          ['Juegos publicados', String(publicados)],
+          ['Plataformas', 'Navegador, Windows y Android'],
+          ['Idiomas', 'Español e inglés'],
+          ['Contacto de prensa', correo(lang, desde)],
+        ]
+      : [
+          ['Studio', 'Jungle Pixel Studio'],
+          ['Based in', 'Colombia · Venezuela'],
+          ['Released games', String(publicados)],
+          ['Platforms', 'Browser, Windows and Android'],
+          ['Languages', 'English and Spanish'],
+          ['Press contact', correo(lang, desde)],
+        ];
+  return `<dl class="facts">${filas
+    .map(([k, v], i) => `<div class="fact fact--${(i % 4) + 1}" data-reveal data-tilt><dt>${k}</dt><dd>${v.startsWith('<') ? v : esc(v)}</dd></div>`)
+    .join('')}</dl>`;
 }
 
 // Logotipo + nombre (cabecera y 404)
@@ -173,29 +256,35 @@ function marca(r) {
 }
 
 // ---------------------------------------------------------------- plantilla
+const NAV_IZQ = ['juegos', 'estudio', 'noticias'];
+const NAV_DER = ['empleo', 'prensa', 'contacto'];
+
 function cabecera(p, lang) {
   const t = textos[lang];
   const ruta = p[lang].ruta;
   const otro = lang === 'es' ? 'en' : 'es';
   const inicio = pagina('inicio')[lang].ruta;
-  const nav = ['juegos', 'estudio', 'contacto']
-    .map((k) => `<li><a href="${enlace(ruta, inicio, '#' + k)}" data-magnetic>${t.nav[k]}</a></li>`)
-    .join('');
-  const navMovil = ['juegos', 'estudio', 'contacto']
-    .map((k, i) => `<li><a href="${enlace(ruta, inicio, '#' + k)}"><span class="menu-movil__num">0${i + 1}</span>${t.nav[k]}</a></li>`)
-    .join('');
+  const item = (k) =>
+    `<li><a href="${enlace(ruta, pagina(k)[lang].ruta)}"${p.id === k ? ' aria-current="page"' : ''}>${t.nav[k]}</a></li>`;
+  const itch = red('itchdotio');
   const idiomas = `<div class="lang" role="group" aria-label="${t.idioma}">
         <a href="${enlace(ruta, pagina(p.id).es.ruta)}" hreflang="es" lang="es"${lang === 'es' ? ' aria-current="true"' : ''}>ES</a>
-        <span aria-hidden="true">/</span>
         <a href="${enlace(ruta, pagina(p.id).en.ruta)}" hreflang="en" lang="en"${lang === 'en' ? ' aria-current="true"' : ''}>EN</a>
       </div>`;
+  const navMovil = [...NAV_IZQ, ...NAV_DER]
+    .map((k, i) => `<li><a href="${enlace(ruta, pagina(k)[lang].ruta)}"${p.id === k ? ' aria-current="page"' : ''}><span class="menu-movil__num">0${i + 1}</span>${t.nav[k]}</a></li>`)
+    .join('');
   return `<a class="skip" href="#contenido">${t.saltar}</a>
 <div class="progress" aria-hidden="true"><span data-progress></span></div>
 <header class="site-header" data-header>
-  <div class="container site-header__inner">
+  <div class="site-header__inner">
+    <nav class="nav nav--left" aria-label="${lang === 'es' ? 'Principal' : 'Main'}"><ul>${NAV_IZQ.map(item).join('')}</ul></nav>
     <a class="brand" href="${enlace(ruta, inicio)}" aria-label="Jungle Pixel Studio — ${t.inicio}">${marca(prefijo(ruta))}</a>
-    <nav class="nav" aria-label="${lang === 'es' ? 'Principal' : 'Main'}"><ul>${nav}</ul></nav>
-    ${idiomas}
+    <nav class="nav nav--right" aria-label="${lang === 'es' ? 'Secundario' : 'Secondary'}"><ul>${NAV_DER.map(item).join('')}</ul></nav>
+    <div class="site-header__actions">
+      ${itch ? `<a class="btn btn--primary btn--small header-cta" href="${esc(itch.url)}" target="_blank" rel="noopener noreferrer">${icono('itchdotio')}<span>${t.cta}</span></a>` : ''}
+      ${idiomas}
+    </div>
     <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="menu-movil" data-menu-toggle>
       <span class="menu-toggle__label" data-open="${t.menu}" data-close="${t.cerrar}">${t.menu}</span>
       <span class="menu-toggle__icon" aria-hidden="true"><i></i><i></i></span>
@@ -211,31 +300,35 @@ function cabecera(p, lang) {
 function pie(p, lang) {
   const t = textos[lang];
   const ruta = p[lang].ruta;
-  const links = legales
+  const legal = legales
     .map((l) => `<li><a href="${enlace(ruta, l[lang].ruta)}"${l.id === p.id ? ' aria-current="page"' : ''}>${l[lang].corto}</a></li>`)
     .join('');
+  const explora = [...NAV_IZQ, ...NAV_DER].map((k) => `<li><a href="${enlace(ruta, pagina(k)[lang].ruta)}">${t.nav[k]}</a></li>`).join('');
   return `<footer class="site-footer">
-  ${svgBordeBosque()}
+  ${svgBorde(7, 'edge edge--footer')}
   <div class="container">
     <div class="footer__top">
-      <div class="footer__brand">
+      <div class="footer__col footer__col--brand">
         <img class="footer__logo" src="${prefijo(ruta)}assets/img/logo/logo-160.webp" width="160" height="160" alt="" loading="lazy" decoding="async">
         <p><strong>Jungle Pixel Studio™</strong><br>${t.lema}<br>${t.hecho}</p>
       </div>
-      <nav class="footer__col" aria-label="${t.legal}">
-        <p class="eyebrow">${t.legal}</p>
-        <ul class="footer__list">${links}</ul>
-      </nav>
       <div class="footer__col">
-        <p class="eyebrow">${t.contacto}</p>
+        <p class="footer__title">${t.contacto}</p>
+        <p><a class="footer__link-strong" href="${enlace(ruta, pagina('contacto')[lang].ruta)}">${t.escribenos}</a></p>
         <p>${correo(lang, ruta)}</p>
-        ${redesPie(lang)}
       </div>
+      <nav class="footer__col" aria-label="${t.explora}">
+        <p class="footer__title">${t.explora}</p>
+        <ul class="footer__links">${explora}</ul>
+      </nav>
     </div>
-    <div class="footer__big" data-reveal>${svgPixel(['JUNGLE PIXEL'], { clase: 'pixel pixel--footer' })}</div>
+    <div class="footer__follow">
+      <p class="footer__title">${lang === 'es' ? 'Síguenos' : 'Follow us'}</p>
+      <ul class="footer__social">${enlacesRedes('footer__social-link')}</ul>
+    </div>
     <div class="footer__bottom">
+      <ul class="footer__legal">${legal}</ul>
       <p>© <span data-year>2026</span> Jungle Pixel Studio. ${t.derechos} ${t.marcas}</p>
-      <a class="to-top" href="#top" data-magnetic>${t.arriba} <span aria-hidden="true">↑</span></a>
     </div>
   </div>
 </footer>`;
@@ -255,7 +348,7 @@ function head(p, lang, extra = '') {
 <meta name="description" content="${esc(datos.descripcion)}">
 <meta name="author" content="Jungle Pixel Studio">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#d6dcc8">
+<meta name="theme-color" content="#17432a">
 <link rel="canonical" href="${absoluta(datos.ruta)}">
 <link rel="alternate" hreflang="es" href="${alt('es')}">
 <link rel="alternate" hreflang="en" href="${alt('en')}">
@@ -274,7 +367,7 @@ function head(p, lang, extra = '') {
 <link rel="icon" href="${r}favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="${r}favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="${r}apple-touch-icon.png">
-<link rel="preload" href="${r}assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="${r}assets/fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${r}assets/fonts/nunito.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${r}assets/css/main.css?v=${V}">
 <script src="${r}assets/js/early.js?v=${V}"></script>
@@ -283,7 +376,7 @@ ${extra}</head>`;
 }
 
 function documento(p, lang, main, extraHead = '') {
-  const clase = p.tipo === 'legal' ? 'page-legal' : 'page-home';
+  const clase = p.tipo === 'legal' ? 'page-legal' : `page-${p.id}`;
   return `<!doctype html>
 <html lang="${lang}" class="no-js">
 ${head(p, lang, extraHead)}
@@ -292,6 +385,12 @@ ${SPRITE}
 ${cabecera(p, lang)}
 ${main}
 ${pie(p, lang)}
+<div class="lightbox" data-lightbox hidden>
+  <button class="lightbox__close" type="button" data-lightbox-close aria-label="${lang === 'es' ? 'Cerrar' : 'Close'}">×</button>
+  <button class="lightbox__nav lightbox__nav--prev" type="button" data-lightbox-prev aria-label="${lang === 'es' ? 'Anterior' : 'Previous'}">‹</button>
+  <img class="lightbox__img" alt="" data-lightbox-img>
+  <button class="lightbox__nav lightbox__nav--next" type="button" data-lightbox-next aria-label="${lang === 'es' ? 'Siguiente' : 'Next'}">›</button>
+</div>
 <p class="sr-only" aria-live="polite" data-live></p>
 </body>
 </html>
@@ -300,25 +399,37 @@ ${pie(p, lang)}
 
 // ---------------------------------------------------------- tokens de texto
 function reemplazar(html, lang, ruta) {
+  const itch = red('itchdotio');
+  const yt = red('youtube');
+  const destacado = juegos.find((j) => j.id === sitio.destacado) ?? juegos[0];
   return html
     .replace(/\{\{correo\}\}/g, () => correo(lang, ruta))
     .replace(/\{\{correo-grande\}\}/g, () => correo(lang, ruta, 'email--big'))
     .replace(/\{\{titular\}\}/g, () => bloqueTitular(lang, ruta))
-    .replace(/\{\{redes\}\}/g, () => redes(lang))
+    .replace(/\{\{canales\}\}/g, () => canales(lang))
+    .replace(/\{\{fichas\}\}/g, () => fichas(lang, ruta))
+    .replace(/\{\{galeria\}\}/g, () => galeria(lang, ruta))
+    .replace(/\{\{galeria-corta\}\}/g, () => galeria(lang, ruta, 9))
     .replace(/\{\{fecha\}\}/g, () => sitio.fechaLegal[lang])
     .replace(/\{\{url\}\}/g, () => sitio.url)
     .replace(/\{\{dominio\}\}/g, () => sitio.url.replace(/^https?:\/\//, ''))
     .replace(/\{\{raiz\}\}/g, () => prefijo(ruta))
+    .replace(/\{\{url-itch\}\}/g, () => esc(itch?.url ?? '#'))
+    .replace(/\{\{url-youtube\}\}/g, () => esc(yt?.url ?? '#'))
     .replace(/\{\{juegos\}\}/g, () => juegos.map((j) => tarjetaJuego(j, lang, ruta)).join('\n'))
-    .replace(/\{\{numJuegos\}\}/g, () => String(juegos.length).padStart(2, '0'))
-    .replace(/\{\{hero\}\}/g, () => svgPixel(['JUNGLE', 'PIXEL@'], { clase: 'pixel pixel--hero' }))
+    .replace(/\{\{fichas-juegos\}\}/g, () => juegos.map((j, i) => fichaJuego(j, i, lang, ruta)).join('\n'))
+    .replace(/\{\{num-juegos\}\}/g, () => String(juegos.filter((j) => !j.secreto).length))
+    .replace(/\{\{destacado-botones\}\}/g, () => botonesJuego(destacado, lang, ''))
+    .replace(/\{\{destacado-fondo\}\}/g, () => `${prefijo(ruta)}assets/img/capturas/portada-${destacado.id}.webp`)
+    .replace(/\{\{fondo:([a-z0-9-]+)\}\}/g, (_, f) => `<img class="page-hero__bg" src="${prefijo(ruta)}assets/img/capturas/${f}.webp" alt="" width="1920" height="1080" fetchpriority="high" decoding="async" data-parallax-bg>`)
+    .replace(/\{\{borde:([a-z-]+)\}\}/g, (_, c) => svgBorde(c.length, `edge edge--${c}`))
+    .replace(/\{\{nubes\}\}/g, () => svgNubes(4))
+    .replace(/\{\{ico:([a-z]+)\}\}/g, (_, id) => icono(id))
     .replace(/\{\{bosque\}\}/g, () => svgBosque())
     .replace(/\{\{icono:([^}]+)\}\}/g, (_, ch) => svgPixel([ch], { clase: 'pixel-icon', hueco: 0, nitido: true }))
-    .replace(/\{\{logo-portada\}\}/g, () => `<div class="hero__logo" data-hero-logo><img src="${prefijo(ruta)}assets/img/logo/logo-480.webp" width="480" height="480" alt="${lang === 'es' ? 'Logotipo de Jungle Pixel Studio: un mono con un mando entre hojas de la jungla' : 'Jungle Pixel Studio logo: a monkey holding a game controller among jungle leaves'}" fetchpriority="high" decoding="async"></div>`)
+    .replace(/\{\{logo-grande\}\}/g, () => `<div class="big-logo" data-logo-tilt><img src="${prefijo(ruta)}assets/img/logo/logo-480.webp" width="480" height="480" alt="${lang === 'es' ? 'Logotipo de Jungle Pixel Studio: un mono con un mando entre hojas de la jungla' : 'Jungle Pixel Studio logo: a monkey holding a game controller among jungle leaves'}" decoding="async"></div>`)
     .replace(/\{\{logo-sello\}\}/g, () => `<img src="${prefijo(ruta)}assets/img/logo/logo-160.webp" width="160" height="160" alt="" loading="lazy" decoding="async">`)
     .replace(/\{\{hoja\}\}/g, () => svgPixel(['@'], { clase: 'pixel-icon pixel-icon--leaf', hueco: 0, nitido: true }))
-    .replace(/\{\{claseJuegos\}\}/g, () => (juegos.length > 1 ? 'games__grid--many' : 'games__grid--one'))
-    .replace(/\{\{pixel:([^}]+)\}\}/g, (_, txt) => svgPixel([txt], { clase: 'pixel pixel--title' }))
     .replace(/\{\{enlace:([a-z0-9-]+)(#[a-z0-9-]+)?\}\}/g, (_, id, ancla = '') => {
       const destino = pagina(id);
       if (!destino) throw new Error(`Enlace a página desconocida: ${id}`);
@@ -337,7 +448,7 @@ function paginaLegal(p, lang, cuerpo) {
     .join('');
   return `<main id="contenido" class="legal">
   <div class="container legal__grid">
-    <aside class="legal__aside">
+    <aside class="legal__aside sticker">
       <details class="toc" open data-toc>
         <summary>${t.enEstaPagina}</summary>
         <ol>${indice}</ol>
@@ -347,7 +458,7 @@ function paginaLegal(p, lang, cuerpo) {
         <ul>${docs}</ul>
       </nav>
     </aside>
-    <article class="legal__article prose">
+    <article class="legal__article prose sticker">
       <p class="eyebrow">${t.legal}</p>
       <h1>${esc(p[lang].titulo)}</h1>
       <p class="legal__meta">${t.actualizado}: <time datetime="${sitio.fechaLegal.iso}">${sitio.fechaLegal[lang]}</time></p>
@@ -383,30 +494,31 @@ function pagina404() {
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#d6dcc8">
+<meta name="theme-color" content="#17432a">
 <title>404 — Jungle Pixel Studio</title>
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
-<link rel="preload" href="/assets/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/fredoka.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/main.css?v=${V}">
 <script src="/assets/js/early.js?v=${V}"></script>
 <script type="module" src="/assets/js/main.js?v=${V}"></script>
 </head>
 <body class="page-404" id="top">
 ${SPRITE}
-<main id="contenido" class="not-found">
+<main id="contenido" class="not-found band band--sky">
+  ${svgNubes(4)}
   <div class="container not-found__inner">
     <a class="brand" href="/" aria-label="Jungle Pixel Studio">${marca('/')}</a>
     <h1 class="not-found__title"><span class="sr-only">404</span>${svgPixel(['404'], { clase: 'pixel pixel--title pixel--404' })}</h1>
     <p class="not-found__text" lang="es">Esta página se perdió en la jungla.</p>
     <p class="not-found__text not-found__text--en" lang="en">This page got lost in the jungle.</p>
     <div class="not-found__actions">
-      <a class="btn btn--primary" href="/" data-magnetic><span>Volver al inicio</span></a>
-      <a class="btn btn--ghost" href="/en/" lang="en" data-magnetic><span>Back to home</span></a>
+      <a class="btn btn--primary" href="/"><span>Volver al inicio</span></a>
+      <a class="btn btn--light" href="/en/" lang="en"><span>Back to home</span></a>
     </div>
   </div>
+  ${svgBorde(9, 'edge edge--jungle')}
 </main>
-<div class="not-found__forest">${svgBosque()}</div>
 </body>
 </html>
 `;
@@ -485,13 +597,11 @@ async function main() {
     for (const lang of IDIOMAS) {
       const ruta = p[lang].ruta;
       const fuente = path.join(SRC, 'paginas', `${p.id}.${lang}.html`);
-      let cuerpo = reemplazar(await readFile(fuente, 'utf8'), lang, ruta);
-      let html;
-      if (p.tipo === 'legal') {
-        html = documento(p, lang, paginaLegal(p, lang, cuerpo));
-      } else {
-        html = documento(p, lang, `<main id="contenido">\n${cuerpo}\n</main>`, jsonLd());
-      }
+      const cuerpo = reemplazar(await readFile(fuente, 'utf8'), lang, ruta);
+      const html =
+        p.tipo === 'legal'
+          ? documento(p, lang, paginaLegal(p, lang, cuerpo))
+          : documento(p, lang, `<main id="contenido">\n${cuerpo}\n</main>`, p.id === 'inicio' ? jsonLd() : '');
       if (/\{\{[^}]+\}\}/.test(html)) throw new Error(`Quedó un {{token}} sin reemplazar en ${ruta}`);
       await escribir(ruta, html);
       n++;

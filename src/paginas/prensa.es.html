@@ -1,0 +1,43 @@
+<section class="page-hero" data-hero aria-labelledby="hero-titulo">
+  {{fondo:hoard-sweeper-2}}
+  <div class="container page-hero__inner">
+    <h1 class="t-outline t-xl" id="hero-titulo" data-letters>Kit de <span class="hl">prensa</span></h1>
+    <p class="page-hero__lead" data-reveal>Ficha del estudio, logotipos, juegos y capturas para prensa y creadores de contenido que hablen de Jungle Pixel Studio.</p>
+    <div class="actions" data-reveal>
+      <a class="btn btn--primary" href="{{enlace:contacto}}"><span>Contacto de prensa</span></a>
+      <a class="btn btn--light" href="{{enlace:creadores}}"><span>Política para creadores</span></a>
+    </div>
+  </div>
+  {{borde:cream}}
+</section>
+
+<section class="band band--cream" aria-labelledby="ficha-titulo">
+  <div class="container band__inner">
+    <h2 class="t-solid t-lg band__title" id="ficha-titulo" data-reveal>Ficha del estudio</h2>
+    {{fichas}}
+  </div>
+  {{borde:jungle}}
+</section>
+
+<section class="band band--jungle" aria-labelledby="logos-titulo">
+  <div class="container band__inner presskit">
+    <div class="presskit__logo" data-reveal>{{logo-grande}}</div>
+    <div class="presskit__text" data-reveal>
+      <h2 class="t-outline t-lg" id="logos-titulo">Logotipo</h2>
+      <p>El mono de Jungle Pixel Studio. Úsalo sin modificarlo para hablar de nosotros o de nuestros juegos.</p>
+      <div class="actions actions--left">
+        <a class="btn btn--light" href="{{raiz}}assets/img/logo/logo-512.png" download="jungle-pixel-studio-logo.png"><span>Descargar PNG (512 px)</span></a>
+        <a class="btn btn--light" href="{{raiz}}assets/img/logo/logo-480.webp" download="jungle-pixel-studio-logo.webp"><span>Descargar WebP</span></a>
+      </div>
+    </div>
+  </div>
+  {{borde:cream}}
+</section>
+
+<section class="band band--cream" aria-labelledby="capturas-titulo">
+  <div class="container band__inner">
+    <h2 class="t-solid t-lg band__title" id="capturas-titulo" data-reveal>Capturas</h2>
+    <p class="band__lead band__lead--center" data-reveal>Haz clic para verlas en grande. Si necesitas material en alta resolución o claves de prensa, escríbenos.</p>
+{{galeria}}
+  </div>
+</section>

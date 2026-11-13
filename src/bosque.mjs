@@ -90,3 +90,46 @@ export function svgBordeBosque() {
   const c = { celda: 7, base: 34, ondas: [[10, 0.006, 0.4], [5, 0.02, 2]], altoArboles: [55, 130], separacion: [0, 6], pinos: 0.75, semilla: 77 };
   return `<svg class="footer__forest" viewBox="0 0 ${ANCHO} 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><path d="${capa({ ancho: ANCHO, alto: 200, ...c })}"/></svg>`;
 }
+
+/**
+ * Borde de hierba en pixeles para separar secciones. Se pinta con currentColor,
+ * así que el color lo pone la clase CSS (el de la sección que viene debajo).
+ */
+export function svgBorde(semilla = 5, clase = 'edge') {
+  const c = { celda: 6, base: 14, ondas: [[4, 0.01, semilla], [3, 0.031, semilla * 2]], altoArboles: [8, 30], separacion: [0, 2], pinos: 0.9, semilla };
+  return `<svg class="${clase}" viewBox="0 0 1600 60" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><path fill="currentColor" d="${capa({ ancho: 1600, alto: 60, ...c })}"/></svg>`;
+}
+
+// Nubes de pixeles (cada fila: columnas encendidas)
+const NUBES = [
+  ['......####........', '....########......', '..###########.##..', '.################.', '##################', '.################.'],
+  ['....####.....', '..########...', '.###########.', '#############', '.###########.'],
+  ['.......###......', '..###.#######...', '.##############.', '################', '.##############.'],
+];
+
+function caminoNube(filas, t) {
+  let d = '';
+  filas.forEach((fila, y) => {
+    let x = 0;
+    while (x < fila.length) {
+      if (fila[x] === '#') {
+        let x2 = x;
+        while (x2 < fila.length && fila[x2] === '#') x2++;
+        d += `M${x * t} ${y * t}h${(x2 - x) * t}v${t}h${-(x2 - x) * t}z`;
+        x = x2;
+      } else x++;
+    }
+  });
+  return d;
+}
+
+/** Varias nubes de pixeles colocadas por CSS (.cloud--1 … .cloud--n). */
+export function svgNubes(n = 4) {
+  let html = '';
+  for (let i = 0; i < n; i++) {
+    const f = NUBES[i % NUBES.length];
+    const t = 10;
+    html += `<svg class="cloud cloud--${i + 1}" data-depth="${(0.3 + (i % 3) * 0.35).toFixed(2)}" viewBox="0 0 ${f[0].length * t} ${f.length * t}" aria-hidden="true" focusable="false"><path d="${caminoNube(f, t)}"/></svg>`;
+  }
+  return `<div class="clouds" aria-hidden="true">${html}</div>`;
+}

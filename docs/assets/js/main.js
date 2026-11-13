@@ -287,59 +287,21 @@ function initPixelTitles() {
 function initForest() {
   const hero = $('[data-hero]');
   if (!hero) return;
-  const layers = $$('.forest__layer', hero).map((el) => ({ el, depth: +el.dataset.depth || 0.5, x: 0, y: 0 }));
   let visible = true;
   new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(hero);
 
-  // Capas del bosque: se mueven con el ratón y con el scroll (paralaje)
-  if (!reduce && layers.length) {
+  // Fondo de la portada: paralaje suave con el ratón y el scroll
+  const bg = $('[data-parallax-bg]', hero);
+  if (bg && !reduce) {
+    let bx = 0;
+    let by = 0;
     updaters.push(() => {
       if (!visible) return;
       const nx = pointer.seen ? clamp(pointer.x / window.innerWidth - 0.5, -0.5, 0.5) : 0;
       const ny = pointer.seen ? clamp(pointer.y / window.innerHeight - 0.5, -0.5, 0.5) : 0;
-      for (const l of layers) {
-        const tx = -nx * 46 * l.depth;
-        const ty = -ny * 14 * l.depth + scrollY * Math.max(0, 1 - l.depth) * 0.45;
-        l.x = lerp(l.x, tx, 0.07);
-        l.y = lerp(l.y, ty, 0.12);
-        l.el.style.transform = `translate3d(${l.x.toFixed(2)}px, ${l.y.toFixed(2)}px, 0)`;
-      }
-    });
-  }
-
-  // El logo mira hacia el ratón (se inclina) y salta si le haces clic
-  const logo = $('[data-hero-logo]', hero);
-  if (logo && !reduce) {
-    let rx = 0;
-    let ry = 0;
-    let tx = 0;
-    let ty = 0;
-    logo.addEventListener('click', () => {
-      logo.classList.remove('is-jump');
-      void logo.offsetWidth;
-      logo.classList.add('is-jump');
-    });
-    logo.addEventListener('animationend', () => logo.classList.remove('is-jump'));
-    updaters.push(() => {
-      if (!visible) return;
-      let trx = 0;
-      let try_ = 0;
-      let ttx = 0;
-      let tty = 0;
-      if (pointer.seen && finePointer) {
-        const b = logo.getBoundingClientRect();
-        const dx = (pointer.x - (b.left + b.width / 2)) / window.innerWidth;
-        const dy = (pointer.y - (b.top + b.height / 2)) / window.innerHeight;
-        try_ = clamp(dx * 28, -14, 14);
-        trx = clamp(-dy * 22, -12, 12);
-        ttx = clamp(dx * 18, -12, 12);
-        tty = clamp(dy * 12, -10, 10);
-      }
-      rx = lerp(rx, trx, 0.08);
-      ry = lerp(ry, try_, 0.08);
-      tx = lerp(tx, ttx, 0.08);
-      ty = lerp(ty, tty - scrollY * 0.12, 0.2);
-      logo.style.transform = `perspective(900px) translate3d(${tx.toFixed(2)}px, ${ty.toFixed(2)}px, 0) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+      bx = lerp(bx, -nx * 30, 0.06);
+      by = lerp(by, -ny * 20 + scrollY * 0.25, 0.12);
+      bg.style.transform = `translate3d(${bx.toFixed(2)}px, ${by.toFixed(2)}px, 0)`;
     });
   }
 
@@ -559,6 +521,108 @@ function initForest() {
   });
 }
 
+// ------------------------------------------- logo grande que mira al ratón
+function initLogoTilt() {
+  if (reduce) return;
+  $$('[data-logo-tilt]').forEach((logo) => {
+    let visible = false;
+    new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(logo);
+    let rx = 0;
+    let ry = 0;
+    logo.addEventListener('click', () => {
+      logo.animate(
+        [{ transform: logo.style.transform }, { transform: logo.style.transform + ' translateY(-30px) scale(1.05,0.95)' }, { transform: logo.style.transform }],
+        { duration: 600, easing: 'cubic-bezier(.34,1.56,.64,1)' }
+      );
+    });
+    updaters.push(() => {
+      if (!visible || !pointer.seen || !finePointer) return;
+      const b = logo.getBoundingClientRect();
+      const dx = (pointer.x - (b.left + b.width / 2)) / window.innerWidth;
+      const dy = (pointer.y - (b.top + b.height / 2)) / window.innerHeight;
+      ry = lerp(ry, clamp(dx * 30, -16, 16), 0.08);
+      rx = lerp(rx, clamp(-dy * 24, -12, 12), 0.08);
+      logo.style.transform = `perspective(900px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+    });
+  });
+}
+
+// ------------------------------------------------- nubes que flotan
+function initClouds() {
+  if (reduce) return;
+  $$('.clouds').forEach((caja) => {
+    let visible = false;
+    new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(caja);
+    const nubes = $$('.cloud', caja).map((el, i) => ({ el, d: +el.dataset.depth || 0.5, x: 0, y: 0, f: i * 1.7 }));
+    updaters.push((dt, now) => {
+      if (!visible) return;
+      const r = caja.getBoundingClientRect();
+      const prog = (window.innerHeight - r.top) / (window.innerHeight + r.height);
+      const nx = pointer.seen ? clamp(pointer.x / window.innerWidth - 0.5, -0.5, 0.5) : 0;
+      for (const n of nubes) {
+        const tx = nx * 50 * n.d + Math.sin(now / 2600 + n.f) * 14;
+        const ty = (prog - 0.5) * -90 * n.d;
+        n.x = lerp(n.x, tx, 0.05);
+        n.y = lerp(n.y, ty, 0.1);
+        n.el.style.transform = `translate3d(${n.x.toFixed(1)}px, ${n.y.toFixed(1)}px, 0)`;
+      }
+    });
+  });
+}
+
+// ------------------------------------------------- visor de capturas
+function initLightbox() {
+  const box = $('[data-lightbox]');
+  const items = $$('[data-gallery] [data-full]');
+  if (!box || !items.length) return;
+  const img = $('[data-lightbox-img]', box);
+  let actual = 0;
+  let origen = null;
+  const mostrar = (i) => {
+    actual = (i + items.length) % items.length;
+    img.src = items[actual].dataset.full;
+    img.alt = items[actual].dataset.alt || '';
+  };
+  const abrir = (i) => {
+    origen = document.activeElement;
+    mostrar(i);
+    box.hidden = false;
+    document.body.classList.add('lightbox-open');
+    requestAnimationFrame(() => box.classList.add('is-open'));
+    $('[data-lightbox-close]', box).focus();
+  };
+  const cerrar = () => {
+    box.classList.remove('is-open');
+    document.body.classList.remove('lightbox-open');
+    setTimeout(() => (box.hidden = true), 250);
+    origen?.focus();
+  };
+  items.forEach((el, i) => el.addEventListener('click', () => abrir(i)));
+  $('[data-lightbox-close]', box).addEventListener('click', cerrar);
+  $('[data-lightbox-prev]', box).addEventListener('click', () => mostrar(actual - 1));
+  $('[data-lightbox-next]', box).addEventListener('click', () => mostrar(actual + 1));
+  box.addEventListener('click', (e) => {
+    if (e.target === box) cerrar();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (box.hidden) return;
+    if (e.key === 'Escape') cerrar();
+    else if (e.key === 'ArrowLeft') mostrar(actual - 1);
+    else if (e.key === 'ArrowRight') mostrar(actual + 1);
+    else if (e.key === 'Tab') {
+      const focos = $$('button', box);
+      const i = focos.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) {
+        e.preventDefault();
+        focos[focos.length - 1].focus();
+      } else if (!e.shiftKey && i === focos.length - 1) {
+        e.preventDefault();
+        focos[0].focus();
+      }
+    }
+  });
+}
+
 // --------------------------------------------------- manifiesto palabra a palabra
 function initWords() {
   const el = $('[data-words]');
@@ -681,7 +745,7 @@ function initCursor() {
   window.addEventListener('pointerdown', () => ring.classList.add('is-down'));
   window.addEventListener('pointerup', () => ring.classList.remove('is-down'));
   document.addEventListener('pointerover', (e) => {
-    const hit = e.target.closest('a, button, summary, [data-tilt], [data-copy-email], [data-hero-logo]');
+    const hit = e.target.closest('a, button, summary, [data-tilt], [data-copy-email], [data-logo-tilt]');
     ring.classList.toggle('is-hover', !!hit);
   });
   document.addEventListener('pointerleave', () => [dot, ring, spot].forEach((n) => n.classList.remove('is-visible')));
@@ -771,7 +835,7 @@ function initLoop() {
 }
 
 // ------------------------------------------------------------------ inicio
-const inits = [initEmail, initYear, initHeader, initMenu, initActiveNav, initReveal, initPixelTitles, initForest, initWords, initTrail, initTilt, initMagnetic, initCursor, initToc];
+const inits = [initEmail, initYear, initHeader, initMenu, initActiveNav, initReveal, initPixelTitles, initForest, initLogoTilt, initClouds, initLightbox, initWords, initTrail, initTilt, initMagnetic, initCursor, initToc];
 for (const init of inits) {
   try {
     init();

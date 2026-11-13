@@ -78,7 +78,7 @@ async function main() {
   await guardar(apple, 'src/raiz/apple-touch-icon.png');
 
   // Imagen para redes sociales (1200x630)
-  await document.fonts.load('700 80px Fraunces');
+  await document.fonts.load('700 80px Fredoka');
   await document.fonts.load('600 30px Nunito');
   const og = lienzo(1200, 630);
   const g = og.getContext('2d');
@@ -104,7 +104,7 @@ async function main() {
   });
   g.drawImage(reducir(logo, 0, 0, L, L, 400), 740, 40);
   g.fillStyle = '#24382c';
-  g.font = '700 92px Fraunces';
+  g.font = '700 92px Fredoka';
   g.fillText('Jungle Pixel', 70, 215);
   g.fillStyle = '#3f6b4b';
   g.fillText('Studio', 70, 315);

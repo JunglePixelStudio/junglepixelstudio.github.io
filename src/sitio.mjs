@@ -18,6 +18,9 @@ export const sitio = {
 
   correo: 'junglepixel2024@gmail.com',
 
+  // Juego que protagoniza la portada (su id en la lista de juegos).
+  destacado: 'hoard-sweeper',
+
   // Datos del titular para los textos legales. Opcionales: si los rellenas, aparecen en el aviso legal
   // y en la política de privacidad (recomendable si algún día recoges datos con formularios o boletines).
   titular: {
@@ -191,6 +194,42 @@ export const paginas = [
     },
   },
   {
+    id: 'juegos',
+    tipo: 'pagina',
+    es: { ruta: 'juegos.html', titulo: 'Juegos — Jungle Pixel Studio', descripcion: 'Todos los juegos de Jungle Pixel Studio: Hoard Sweeper, Trick or Treat at 3AM, Puffy Merge Zoo, Harbor Quest, Bald Peacock y Bonk the Donk.' },
+    en: { ruta: 'en/games.html', titulo: 'Games — Jungle Pixel Studio', descripcion: 'Every game by Jungle Pixel Studio: Hoard Sweeper, Trick or Treat at 3AM, Puffy Merge Zoo, Harbor Quest, Bald Peacock and Bonk the Donk.' },
+  },
+  {
+    id: 'estudio',
+    tipo: 'pagina',
+    es: { ruta: 'estudio.html', titulo: 'El estudio — Jungle Pixel Studio', descripcion: 'Quiénes somos: un estudio independiente de videojuegos con corazón venezolano y hogar en Colombia.' },
+    en: { ruta: 'en/studio.html', titulo: 'The studio — Jungle Pixel Studio', descripcion: 'Who we are: an independent video game studio with a Venezuelan heart and a home in Colombia.' },
+  },
+  {
+    id: 'noticias',
+    tipo: 'pagina',
+    es: { ruta: 'noticias.html', titulo: 'Noticias — Jungle Pixel Studio', descripcion: 'Sigue el desarrollo de nuestros juegos en nuestros canales.' },
+    en: { ruta: 'en/news.html', titulo: 'News — Jungle Pixel Studio', descripcion: 'Follow the development of our games on our channels.' },
+  },
+  {
+    id: 'empleo',
+    tipo: 'pagina',
+    es: { ruta: 'empleo.html', titulo: 'Empleo — Jungle Pixel Studio', descripcion: 'Trabaja con Jungle Pixel Studio.' },
+    en: { ruta: 'en/careers.html', titulo: 'Careers — Jungle Pixel Studio', descripcion: 'Work with Jungle Pixel Studio.' },
+  },
+  {
+    id: 'prensa',
+    tipo: 'pagina',
+    es: { ruta: 'prensa.html', titulo: 'Kit de prensa — Jungle Pixel Studio', descripcion: 'Ficha del estudio, logotipos, juegos y capturas para prensa y creadores de contenido.' },
+    en: { ruta: 'en/press.html', titulo: 'Press kit — Jungle Pixel Studio', descripcion: 'Studio fact sheet, logos, games and screenshots for press and content creators.' },
+  },
+  {
+    id: 'contacto',
+    tipo: 'pagina',
+    es: { ruta: 'contacto.html', titulo: 'Contacto — Jungle Pixel Studio', descripcion: 'Escríbenos: prensa, publishers, colaboraciones o solo saludar.' },
+    en: { ruta: 'en/contact.html', titulo: 'Contact — Jungle Pixel Studio', descripcion: 'Get in touch: press, publishers, collaborations or just saying hi.' },
+  },
+  {
     id: 'aviso-legal',
     tipo: 'legal',
     es: { ruta: 'legal/aviso-legal.html', titulo: 'Aviso legal y términos de uso', corto: 'Aviso legal', descripcion: 'Titular, condiciones de uso y ley aplicable de la web de Jungle Pixel Studio.' },
@@ -235,7 +274,10 @@ export const textos = {
   es: {
     saltar: 'Saltar al contenido',
     inicio: 'Inicio',
-    nav: { juegos: 'Juegos', estudio: 'Estudio', contacto: 'Contacto' },
+    nav: { juegos: 'Juegos', estudio: 'Estudio', noticias: 'Noticias', empleo: 'Empleo', prensa: 'Prensa', contacto: 'Contacto' },
+    cta: 'Jugar en itch.io',
+    explora: 'Explora',
+    escribenos: 'Escríbenos un mensaje',
     menu: 'Menú',
     cerrar: 'Cerrar',
     idioma: 'Idioma',
@@ -258,7 +300,10 @@ export const textos = {
   en: {
     saltar: 'Skip to content',
     inicio: 'Home',
-    nav: { juegos: 'Games', estudio: 'Studio', contacto: 'Contact' },
+    nav: { juegos: 'Games', estudio: 'Studio', noticias: 'News', empleo: 'Careers', prensa: 'Press', contacto: 'Contact' },
+    cta: 'Play on itch.io',
+    explora: 'Explore',
+    escribenos: 'Send us a message',
     menu: 'Menu',
     cerrar: 'Close',
     idioma: 'Language',

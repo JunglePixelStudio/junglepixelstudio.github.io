@@ -1,0 +1,31 @@
+<section class="page-hero" data-hero aria-labelledby="hero-titulo">
+  {{fondo:bald-peacock-1}}
+  <div class="container page-hero__inner">
+    <h1 class="t-outline t-xl" id="hero-titulo" data-letters><span class="hl">Contact</span></h1>
+    <p class="page-hero__lead" data-reveal>Questions about the studio or our games? Press, publishers or collaborations? Drop us a line and we'll get back to you.</p>
+  </div>
+  {{borde:cream}}
+</section>
+
+<section class="band band--cream" aria-labelledby="mensaje-titulo">
+  <div class="container band__inner contact-grid">
+    <div class="letter sticker" data-reveal>
+      <span class="letter__stamp" aria-hidden="true">{{logo-sello}}</span>
+      <h2 class="t-solid t-md" id="mensaje-titulo">Send us a letter</h2>
+      <p>Write to us directly by email. We reply in English and Spanish.</p>
+      <div class="contact__mail">
+        <p class="contact__email" data-magnetic>{{correo-grande}}</p>
+        <button class="btn btn--light btn--small" type="button" data-copy-email><span data-copy-label>Copy email</span></button>
+      </div>
+      <p class="letter__note">No forms: your message only travels through your email, and your data is handled under our <a href="{{enlace:privacidad}}">privacy policy</a>.</p>
+      <ul class="contact__links">
+        <li><a href="{{enlace:creadores}}">Content creator policy <span aria-hidden="true">→</span></a></li>
+        <li><a href="{{enlace:seguridad}}">Report a security issue <span aria-hidden="true">→</span></a></li>
+      </ul>
+    </div>
+    <div class="contact-side">
+      <h2 class="t-solid t-md" data-reveal>Or find us here</h2>
+      {{canales}}
+    </div>
+  </div>
+</section>
